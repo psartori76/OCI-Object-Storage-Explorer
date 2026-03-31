@@ -1,0 +1,71 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"launch": {
+		"configurations": [
+			{
+				"type": "swift",
+				"request": "launch",
+				"args": [],
+				"cwd": "${workspaceFolder:ObjectStorage Drive}",
+				"name": "Debug ObjectStorageExplorer (ObjectStorage Drive)",
+				"target": "ObjectStorageExplorer",
+				"configuration": "debug",
+				"preLaunchTask": "swift: Build Debug ObjectStorageExplorer (ObjectStorage Drive)"
+			},
+			{
+				"type": "swift",
+				"request": "launch",
+				"args": [],
+				"cwd": "${workspaceFolder:ObjectStorage Drive}",
+				"name": "Release ObjectStorageExplorer (ObjectStorage Drive)",
+				"target": "ObjectStorageExplorer",
+				"configuration": "release",
+				"preLaunchTask": "swift: Build Release ObjectStorageExplorer (ObjectStorage Drive)"
+			},
+			{
+				"type": "swift",
+				"request": "launch",
+				"args": [],
+				"cwd": "${workspaceFolder:ObjectStorage Drive}",
+				"name": "Debug ObjectStorage Drive (ObjectStorage Drive)",
+				"target": "ObjectStorage Drive",
+				"configuration": "debug",
+				"preLaunchTask": "swift: Build Debug ObjectStorage Drive (ObjectStorage Drive)"
+			},
+			{
+				"type": "swift",
+				"request": "launch",
+				"args": [],
+				"cwd": "${workspaceFolder:ObjectStorage Drive}",
+				"name": "Release ObjectStorage Drive (ObjectStorage Drive)",
+				"target": "ObjectStorage Drive",
+				"configuration": "release",
+				"preLaunchTask": "swift: Build Release ObjectStorage Drive (ObjectStorage Drive)"
+			},
+			{
+				"type": "swift",
+				"request": "launch",
+				"args": [],
+				"cwd": "${workspaceFolder:ObjectStorage Drive}",
+				"name": "Debug OCIObjectStorageExplorer (ObjectStorage Drive)",
+				"target": "OCIObjectStorageExplorer",
+				"configuration": "debug",
+				"preLaunchTask": "swift: Build Debug OCIObjectStorageExplorer (ObjectStorage Drive)"
+			},
+			{
+				"type": "swift",
+				"request": "launch",
+				"args": [],
+				"cwd": "${workspaceFolder:ObjectStorage Drive}",
+				"name": "Release OCIObjectStorageExplorer (ObjectStorage Drive)",
+				"target": "OCIObjectStorageExplorer",
+				"configuration": "release",
+				"preLaunchTask": "swift: Build Release OCIObjectStorageExplorer (ObjectStorage Drive)"
+			}
+		]
+	}
+}

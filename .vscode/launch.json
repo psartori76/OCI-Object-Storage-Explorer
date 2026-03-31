@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ObjectStorage Drive}",
+            "name": "Debug OCIObjectStorageExplorer",
+            "target": "OCIObjectStorageExplorer",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug OCIObjectStorageExplorer"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ObjectStorage Drive}",
+            "name": "Release OCIObjectStorageExplorer",
+            "target": "OCIObjectStorageExplorer",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release OCIObjectStorageExplorer"
+        }
+    ]
+}
