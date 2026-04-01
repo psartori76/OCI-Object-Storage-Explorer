@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://psartori76.github.io/OCI-Object-Storage-Explorer/sitemap.xml

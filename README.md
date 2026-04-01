@@ -1,15 +1,88 @@
 # OCI Object Storage Explorer for macOS
 
-Native macOS desktop app built with Swift and SwiftUI to authenticate with Oracle Cloud Infrastructure and browse OCI Object Storage with a modern file explorer-style experience.
+OCI Object Storage Explorer is a native macOS desktop app built with Swift and SwiftUI for browsing Oracle Cloud Infrastructure Object Storage. It helps you connect to OCI, list buckets, inspect objects, manage uploads and downloads, and work with Pre-Authenticated Requests from a macOS-native interface.
+
+This repository is useful if you are searching for:
+
+- OCI Object Storage macOS app
+- Oracle Cloud Object Storage browser
+- SwiftUI macOS file explorer for OCI
+- native Oracle Cloud desktop client for macOS
+- macOS bucket and object browser built with Swift
+
+## Quick Links
+
+- Repository: [GitHub repository](https://github.com/psartori76/OCI-Object-Storage-Explorer)
+- Website: [Project website](https://psartori76.github.io/OCI-Object-Storage-Explorer/)
+- Latest release: [Download latest release](https://github.com/psartori76/OCI-Object-Storage-Explorer/releases/latest)
+
+## Why This Project Exists
+
+OCI Object Storage is powerful, but many workflows still happen in browser consoles or generic API tooling. This project focuses on a native macOS experience for Oracle Cloud users who want a cleaner desktop workflow for browsing buckets, checking metadata, transferring files, and generating secure shared links.
 
 ## Highlights
 
 - Native macOS UI built with `NavigationSplitView`, toolbar, sheets, inspector, and light/dark mode support
-- Layered architecture with clear separation between UI, view models, core models, services, and utilities
+- SwiftUI app architecture with clear separation between UI, view models, services, and shared core utilities
 - Real OCI Object Storage integration through signed REST requests
 - Secure secret storage in the macOS Keychain
-- Full multilingual UI foundation with `pt-BR`, English, and Spanish localization
-- Architecture ready for future authentication methods and product expansion
+- Multilingual UI support with Portuguese (Brazil), English, and Spanish
+- Locale-aware formatting for dates, times, counts, and byte sizes
+- Release packaging into a macOS `.app` bundle
+
+## Features
+
+### OCI authentication
+
+- Saved profiles with create, edit, duplicate, and remove flows
+- API Key as the primary authentication method
+- Namespace auto-detection
+- Connection testing
+- Secure Keychain persistence
+- Region loading from tenancy subscriptions
+
+### Bucket and object browsing
+
+- Bucket list in the sidebar
+- Bucket creation and deletion
+- Bucket details and inspector
+- Prefix navigation with breadcrumb
+- Local incremental search
+- Object and folder browsing
+- Context actions for common operations
+- Object versions viewer
+
+### Transfers
+
+- Multi-file upload via native file picker
+- Multi-object download to a local folder
+- Conflict resolution for downloads
+- Progress tracking
+- Cancellation and retry
+- Dedicated transfer queue view
+
+### Pre-Authenticated Requests
+
+- Create Pre-Authenticated Requests
+- List PARs for the current bucket
+- Remove PARs
+- Copy generated URLs
+
+### Diagnostics
+
+- In-memory logging
+- Diagnostics screen with close action
+- Sensitive-data redaction in logs
+
+## Localization
+
+The app currently ships with:
+
+- Portuguese (Brazil)
+- English
+- Spanish
+
+The UI follows the macOS system language automatically. GitHub-facing documentation, changelog entries, and release notes are now maintained in English by default.
 
 ## Architecture
 
@@ -113,78 +186,17 @@ Uploads and downloads run through `TransferCoordinator` with:
 - per-item progress
 - cancellation
 - retry
-- queued/running/completed/failed states
+- queued, running, completed, and failed states
 
 ### 5. Native localization architecture
 
-The app now uses Apple-native localization resources with a centralized helper:
+The app uses Apple-native localization resources with a centralized helper:
 
 - Base localization: `pt-BR`
 - Additional locales: `en`, `es`
 - Shared strings in `Localizable.strings`
 - Pluralization in `Localizable.stringsdict`
 - Locale-aware formatting for dates, times, and byte counts
-
-## Features
-
-### Authentication
-
-- Saved profiles with create, edit, duplicate, and remove flows
-- API Key as the primary authentication method
-- Namespace auto-detection
-- Connection testing
-- Secure Keychain persistence
-- Region loading from tenancy subscriptions
-
-### Object Storage Explorer
-
-- Bucket list in the sidebar
-- Bucket create and delete
-- Bucket details and inspector
-- Prefix navigation with breadcrumb
-- Local incremental search
-- Object and folder browsing
-- Context actions for common operations
-
-### Objects
-
-- Object listing
-- Metadata loading
-- Object deletion
-- Copy object name and full path
-- Object versions viewer
-
-### Transfers
-
-- Multi-file upload via native file picker
-- Multi-object download to a local folder
-- Conflict resolution for downloads
-- Progress tracking
-- Cancellation and retry
-- Dedicated transfer queue view
-
-### PAR Management
-
-- Create Pre-Authenticated Requests
-- List PARs for the current bucket
-- Remove PARs
-- Copy generated URLs
-
-### Diagnostics
-
-- In-memory logging
-- Diagnostics screen
-- Sensitive-data redaction in logs
-
-## Localization
-
-The app currently ships with:
-
-- Portuguese (Brazil)
-- English
-- Spanish
-
-The UI follows the macOS system language automatically. Product-facing GitHub documentation and release notes are now maintained in English by default.
 
 ## Requirements
 
@@ -262,3 +274,7 @@ You can drag the generated `.app` into `Applications`.
    - Region
    - Namespace, if you want to set it manually
 4. Import the private PEM file in the app.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for release history and product improvements.
