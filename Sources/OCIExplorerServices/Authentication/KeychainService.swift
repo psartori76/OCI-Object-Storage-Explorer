@@ -27,7 +27,7 @@ public final class KeychainService: KeychainServiceProtocol, @unchecked Sendable
         let passphraseData = try loadSecret(account: keyAccount(for: profileID, suffix: "passphrase"))
         let passphrase = passphraseData.flatMap { String(data: $0, encoding: .utf8) }.flatMap { $0.isEmpty ? nil : $0 }
         guard let privateKeyPEM = String(data: privateKeyData, encoding: .utf8) else {
-            throw AppError.configuration("Não foi possível decodificar a chave privada salva no Keychain.")
+            throw AppError.configuration(L10n.string("error.keychain.decode_private_key"))
         }
         return AuthProfileSecrets(privateKeyPEM: privateKeyPEM, passphrase: passphrase)
     }
@@ -61,7 +61,7 @@ public final class KeychainService: KeychainServiceProtocol, @unchecked Sendable
 
         let status = SecItemAdd(attributes as CFDictionary, nil)
         guard status == errSecSuccess else {
-            throw AppError.configuration("Falha ao salvar credenciais no Keychain (\(status)).")
+            throw AppError.configuration(L10n.string("error.keychain.save", status))
         }
     }
 
@@ -80,7 +80,7 @@ public final class KeychainService: KeychainServiceProtocol, @unchecked Sendable
             return nil
         }
         guard status == errSecSuccess else {
-            throw AppError.configuration("Falha ao ler credenciais do Keychain (\(status)).")
+            throw AppError.configuration(L10n.string("error.keychain.read", status))
         }
         return item as? Data
     }
@@ -93,7 +93,7 @@ public final class KeychainService: KeychainServiceProtocol, @unchecked Sendable
         ]
         let status = SecItemDelete(query as CFDictionary)
         if status != errSecSuccess, status != errSecItemNotFound {
-            throw AppError.configuration("Falha ao remover item do Keychain (\(status)).")
+            throw AppError.configuration(L10n.string("error.keychain.delete", status))
         }
     }
 }

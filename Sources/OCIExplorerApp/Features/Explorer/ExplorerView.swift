@@ -90,7 +90,7 @@ struct ExplorerView: View {
                 ErrorBannerView(
                     title: banner.title,
                     message: banner.message,
-                    retryTitle: "Tentar novamente"
+                    retryTitle: L10n.string("explorer.banner.retry")
                 ) {
                     Task { await viewModel.retryAfterError() }
                 } onDismiss: {
@@ -106,16 +106,16 @@ struct ExplorerView: View {
                 case .idle:
                     EmptyStateView(
                         systemImage: "externaldrive",
-                        title: "Selecione um bucket",
-                        message: "Escolha um bucket na barra lateral para navegar por pastas virtuais e objetos."
+                        title: L10n.string("explorer.empty.select_bucket.title"),
+                        message: L10n.string("explorer.empty.select_bucket.message")
                     )
                 case .loading:
-                    ExplorerLoadingView(title: "Carregando conteúdo do bucket…")
+                    ExplorerLoadingView(title: L10n.string("explorer.loading.bucket"))
                 case .error:
                     EmptyStateView(
                         systemImage: "exclamationmark.triangle",
-                        title: "Não foi possível carregar os objetos",
-                        message: "Use o botão de atualizar para tentar novamente."
+                        title: L10n.string("explorer.error.load_objects.title"),
+                        message: L10n.string("explorer.error.load_objects.message")
                     )
                 case .empty:
                     if viewModel.buckets.isEmpty {
@@ -151,41 +151,41 @@ struct ExplorerView: View {
                 Button {
                     Task { await viewModel.queueUploads() }
                 } label: {
-                    Label("Upload", systemImage: "arrow.up")
+                    Label(L10n.string("common.upload"), systemImage: "arrow.up")
                 }
-                .help("Enviar arquivos para o bucket atual")
+                .help(L10n.string("explorer.toolbar.upload.help"))
                 .disabled(viewModel.selectedBucket == nil)
 
                 Button {
                     Task { await viewModel.queueDownloads() }
                 } label: {
-                    Label("Download", systemImage: "arrow.down")
+                    Label(L10n.string("common.download"), systemImage: "arrow.down")
                 }
-                .help("Baixar os objetos selecionados")
+                .help(L10n.string("explorer.toolbar.download.help"))
                 .disabled(!viewModel.canDownloadSelection)
 
                 Button {
                     showingCreateFolderSheet = true
                 } label: {
-                    Label("Nova pasta", systemImage: "folder.badge.plus")
+                    Label(L10n.string("explorer.toolbar.new_folder"), systemImage: "folder.badge.plus")
                 }
-                .help("Criar uma pasta virtual no prefixo atual")
+                .help(L10n.string("explorer.toolbar.new_folder.help"))
                 .disabled(viewModel.selectedBucket == nil)
 
                 Button(role: .destructive) {
                     Task { await viewModel.deleteSelectedObjects() }
                 } label: {
-                    Label("Deletar", systemImage: "trash")
+                    Label(L10n.string("explorer.toolbar.delete"), systemImage: "trash")
                 }
-                .help("Excluir o objeto selecionado")
+                .help(L10n.string("explorer.toolbar.delete.help"))
                 .disabled(!viewModel.canDeleteSelection)
 
                 Button {
                     Task { await viewModel.showVersionsForSelectedObject() }
                 } label: {
-                    Label("Ver versões", systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+                    Label(L10n.string("explorer.toolbar.view_versions"), systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90")
                 }
-                .help("Abrir o histórico de versões do objeto selecionado")
+                .help(L10n.string("explorer.toolbar.view_versions.help"))
                 .disabled(!viewModel.canShowVersionsForSelection)
             }
 
@@ -193,9 +193,9 @@ struct ExplorerView: View {
                 Button {
                     Task { await viewModel.refreshCurrentPrefix() }
                 } label: {
-                    Label("Refresh", systemImage: "arrow.clockwise")
+                    Label(L10n.string("common.refresh"), systemImage: "arrow.clockwise")
                 }
-                .help("Atualizar o bucket ou pasta atual")
+                .help(L10n.string("explorer.toolbar.refresh.help"))
                 .disabled(viewModel.selectedBucket == nil)
             }
 
@@ -205,9 +205,9 @@ struct ExplorerView: View {
                         parManagementSheet = PARSheetContext(viewModel: manager)
                     }
                 } label: {
-                    Label("Criar PAR", systemImage: "link.badge.plus")
+                    Label(L10n.string("explorer.toolbar.create_par"), systemImage: "link.badge.plus")
                 }
-                .help("Criar um link pré-autenticado para bucket ou objeto")
+                .help(L10n.string("explorer.toolbar.create_par.help"))
                 .disabled(!viewModel.canCreatePARForSelection && viewModel.selectedBucket == nil)
             }
 
@@ -215,65 +215,65 @@ struct ExplorerView: View {
                 Button {
                     showingTransferSheet = true
                 } label: {
-                    Label("Fila de transferências", systemImage: "tray.full")
+                    Label(L10n.string("explorer.toolbar.transfer_queue"), systemImage: "tray.full")
                 }
 
                 Button {
                     showingDiagnostics = true
                 } label: {
-                    Label("Diagnóstico", systemImage: "waveform.path.ecg")
+                    Label(L10n.string("common.diagnostics"), systemImage: "waveform.path.ecg")
                 }
             } label: {
-                Label("Mais", systemImage: "ellipsis.circle")
+                Label(L10n.string("common.more"), systemImage: "ellipsis.circle")
             }
-            .help("Abrir utilitários e painéis secundários")
+            .help(L10n.string("explorer.toolbar.more.help"))
         }
 
         ToolbarItem(placement: .automatic) {
-            Button("Desconectar") {
+            Button(L10n.string("common.disconnect")) {
                 onDisconnect()
             }
-            .help("Encerrar a sessão atual")
+            .help(L10n.string("explorer.toolbar.disconnect.help"))
         }
     }
 
     private var createBucketSheet: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("Novo bucket")
+            Text(L10n.string("explorer.create_bucket.title"))
                 .font(.title2.weight(.semibold))
 
-            AppSectionCard(title: "Configuração do bucket") {
+            AppSectionCard(title: L10n.string("explorer.create_bucket.section")) {
                 VStack(spacing: 14) {
                     AppTextField(
-                        "Nome do bucket",
-                        placeholder: "meu-bucket-oci",
+                        L10n.string("explorer.create_bucket.name"),
+                        placeholder: L10n.string("explorer.create_bucket.name.placeholder"),
                         text: $newBucketRequest.name
                     )
                     AppTextField(
-                        "Compartment OCID",
+                        L10n.string("explorer.create_bucket.compartment"),
                         placeholder: "ocid1.compartment.oc1...",
                         text: $newBucketRequest.compartmentID
                     )
-                    AppPickerField("Storage tier", selection: $newBucketRequest.storageTier) {
+                    AppPickerField(L10n.string("bucket.storage_tier"), selection: $newBucketRequest.storageTier) {
                         ForEach(BucketStorageTier.allCases) { tier in
-                            Text(tier.rawValue).tag(tier)
+                            Text(LocalizedDisplayValue.bucketStorageTier(tier)).tag(tier)
                         }
                     }
-                    AppPickerField("Public access", selection: $newBucketRequest.publicAccessType) {
-                        Text("NoPublicAccess").tag("NoPublicAccess")
-                        Text("ObjectRead").tag("ObjectRead")
+                    AppPickerField(L10n.string("bucket.public_access"), selection: $newBucketRequest.publicAccessType) {
+                        Text(LocalizedDisplayValue.publicAccess("NoPublicAccess")).tag("NoPublicAccess")
+                        Text(LocalizedDisplayValue.publicAccess("ObjectRead")).tag("ObjectRead")
                     }
                 }
             }
 
             HStack {
                 Spacer()
-                Button("Cancelar") {
+                Button(L10n.string("common.cancel")) {
                     showingCreateBucketSheet = false
                     newBucketRequest = CreateBucketRequestModel()
                 }
                 .buttonStyle(AppButtonStyle(kind: .secondary))
-                Button("Criar bucket") {
+                Button(L10n.string("explorer.create_bucket.submit")) {
                     Task {
                         if newBucketRequest.compartmentID.isEmpty {
                             newBucketRequest.compartmentID = viewModel.currentAuth.compartmentOCID
@@ -292,25 +292,25 @@ struct ExplorerView: View {
 
     private var createFolderSheet: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("Nova pasta virtual")
+            Text(L10n.string("explorer.create_folder.title"))
                 .font(.title2.weight(.semibold))
 
-            AppSectionCard(title: "Criar prefixo") {
+            AppSectionCard(title: L10n.string("explorer.create_folder.section")) {
                 AppTextField(
-                    "Nome da pasta",
-                    placeholder: "documentos",
+                    L10n.string("explorer.create_folder.name"),
+                    placeholder: L10n.string("explorer.create_folder.name.placeholder"),
                     text: $newFolderName
                 )
             }
 
             HStack {
                 Spacer()
-                Button("Cancelar") {
+                Button(L10n.string("common.cancel")) {
                     newFolderName = ""
                     showingCreateFolderSheet = false
                 }
                 .buttonStyle(AppButtonStyle(kind: .secondary))
-                Button("Criar pasta") {
+                Button(L10n.string("explorer.create_folder.submit")) {
                     Task {
                         await viewModel.createFolder(named: newFolderName)
                         newFolderName = ""
@@ -365,10 +365,10 @@ private struct RegionWithoutBucketsView: View {
                 }
 
                 VStack(spacing: 8) {
-                    Text("Nenhum bucket nesta região")
+                    Text(L10n.string("explorer.region.empty.title"))
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(theme.textPrimary)
-                    Text("A região selecionada não possui buckets para a conta atual. Você pode criar um bucket agora ou trocar para outra região.")
+                    Text(L10n.string("explorer.region.empty.message"))
                         .font(.body)
                         .foregroundStyle(theme.textSecondary)
                         .multilineTextAlignment(.center)
@@ -376,7 +376,7 @@ private struct RegionWithoutBucketsView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Picker("Região", selection: Binding(
+                    Picker(L10n.string("common.region"), selection: Binding(
                         get: { viewModel.selectedRegionCode },
                         set: { newValue in
                             Task { await viewModel.changeRegion(to: newValue) }
@@ -402,12 +402,12 @@ private struct RegionWithoutBucketsView: View {
                 .frame(maxWidth: 360, alignment: .leading)
 
                 HStack(spacing: 12) {
-                    Button("Criar bucket") {
+                    Button(L10n.string("explorer.create_bucket.submit")) {
                         onCreateBucket()
                     }
                     .buttonStyle(AppButtonStyle(kind: .primary))
 
-                    Button("Atualizar região") {
+                    Button(L10n.string("explorer.region.refresh")) {
                         Task { await viewModel.refreshBuckets() }
                     }
                     .buttonStyle(AppButtonStyle(kind: .secondary))
@@ -438,7 +438,7 @@ private struct BucketSidebarView: View {
         let theme = AppTheme.current(for: colorScheme)
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 8) {
-                Picker("Região", selection: Binding(
+                Picker(L10n.string("common.region"), selection: Binding(
                     get: { viewModel.selectedRegionCode },
                     set: { newValue in
                         Task { await viewModel.changeRegion(to: newValue) }
@@ -468,10 +468,10 @@ private struct BucketSidebarView: View {
 
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Buckets")
+                    Text(L10n.string("explorer.sidebar.buckets"))
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(theme.textPrimary)
-                    Text("\(viewModel.buckets.count) disponíveis")
+                    Text(L10n.plural("count.available_buckets", count: viewModel.buckets.count))
                         .font(.caption)
                         .foregroundStyle(theme.textTertiary)
                 }
@@ -494,7 +494,7 @@ private struct BucketSidebarView: View {
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
                         .stroke(theme.borderSubtle, lineWidth: 1)
                 )
-                .help("Criar um novo bucket")
+                .help(L10n.string("explorer.sidebar.create_bucket.help"))
             }
             .padding(.horizontal, 16)
 
@@ -515,13 +515,13 @@ private struct BucketSidebarView: View {
                     .padding(.vertical, 4)
                     .tag(bucket.id)
                     .contextMenu {
-                        Button("Copiar nome") {
+                        Button(L10n.string("common.copy_name")) {
                             NativeDialogs.copyToPasteboard(bucket.name)
                         }
-                        Button("Atualizar") {
+                        Button(L10n.string("common.refresh")) {
                             Task { await viewModel.refreshBuckets() }
                         }
-                        Button("Deletar bucket", role: .destructive) {
+                        Button(L10n.string("explorer.sidebar.delete_bucket"), role: .destructive) {
                             viewModel.selectedBucketID = bucket.id
                             Task { await viewModel.deleteSelectedBucket() }
                         }
@@ -535,10 +535,10 @@ private struct BucketSidebarView: View {
                         Image(systemName: "tray")
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundStyle(theme.textTertiary)
-                        Text("Nenhum bucket nesta região")
+                        Text(L10n.string("explorer.region.empty.title"))
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(theme.textPrimary)
-                        Text("Troque a região acima ou crie um novo bucket para continuar navegando.")
+                        Text(L10n.string("explorer.sidebar.empty.message"))
                             .font(.caption)
                             .foregroundStyle(theme.textSecondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -627,7 +627,7 @@ private struct BreadcrumbView: View {
                     .foregroundStyle(BrandColors.brandBluePrimary)
                 }
             } else {
-                Text("Escolha um bucket")
+                Text(L10n.string("explorer.breadcrumb.choose_bucket"))
                     .foregroundStyle(theme.textSecondary)
             }
         }
@@ -710,12 +710,12 @@ private struct ObjectListView: View {
                     set: { viewModel.updateSelection($0) }
                 )
             ) {
-                TableColumn("Nome") { item in
+                TableColumn(L10n.string("explorer.table.name")) { item in
                     ObjectNameCell(item: item)
                 }
                 .width(min: 320, ideal: 420)
 
-                TableColumn("Tamanho") { item in
+                TableColumn(L10n.string("explorer.table.size")) { item in
                     HStack {
                         Spacer(minLength: 0)
                         Text(item.size.friendlyByteText)
@@ -725,13 +725,13 @@ private struct ObjectListView: View {
                 }
                 .width(min: 100, ideal: 120)
 
-                TableColumn("Tipo") { item in
-                    Text(item.isFolder ? "Pasta" : "Arquivo")
+                TableColumn(L10n.string("explorer.table.type")) { item in
+                    Text(LocalizedDisplayValue.fileKind(isFolder: item.isFolder))
                         .foregroundStyle(theme.textSecondary)
                 }
                 .width(min: 100, ideal: 120)
 
-                TableColumn("Modificado") { item in
+                TableColumn(L10n.string("explorer.table.modified")) { item in
                     HStack {
                         Spacer(minLength: 0)
                         Text(item.modifiedAt.friendlyDateText)
@@ -741,8 +741,8 @@ private struct ObjectListView: View {
                 }
                 .width(min: 160, ideal: 190)
 
-                TableColumn("Tier") { item in
-                    StorageTierTag(title: item.storageTier ?? "—")
+                TableColumn(L10n.string("explorer.table.tier")) { item in
+                    StorageTierTag(title: LocalizedDisplayValue.bucketStorageTier(rawValue: item.storageTier))
                 }
                 .width(min: 90, ideal: 120)
             }
@@ -784,7 +784,7 @@ private struct ObjectListView: View {
                     Image(systemName: "arrow.down.doc.fill")
                         .font(.system(size: 28))
                         .foregroundStyle(BrandColors.brandBluePrimary)
-                    Text("Solte arquivos aqui para enviar ao bucket atual")
+                    Text(L10n.string("explorer.drop_target"))
                         .font(.headline)
                         .foregroundStyle(theme.textPrimary)
                 }
@@ -807,28 +807,28 @@ private struct ObjectListView: View {
         let selectedFiles = selectedItems.filter { !$0.isFolder }
 
         if !selectedFiles.isEmpty {
-            Button(selectedFiles.count == 1 ? "Download" : "Download \(selectedFiles.count) itens") {
+            Button(selectedFiles.count == 1 ? L10n.string("common.download") : L10n.plural("count.download_action", count: selectedFiles.count)) {
                 viewModel.updateSelection(Set(selectedFiles.map(\.id)))
                 Task { await viewModel.queueDownloads() }
             }
 
-            Button(selectedFiles.count == 1 ? "Copiar nome" : "Copiar nomes") {
+            Button(selectedFiles.count == 1 ? L10n.string("common.copy_name") : L10n.string("common.copy_names")) {
                 viewModel.updateSelection(effectiveSelection)
                 viewModel.copySelectedObjectName()
             }
 
-            Button(selectedFiles.count == 1 ? "Copiar caminho" : "Copiar caminhos") {
+            Button(selectedFiles.count == 1 ? L10n.string("common.copy_path") : L10n.string("common.copy_paths")) {
                 viewModel.updateSelection(effectiveSelection)
                 viewModel.copySelectedObjectPath()
             }
 
             if selectedFiles.count == 1 {
-                Button("Criar PAR") {
+                Button(L10n.string("explorer.toolbar.create_par")) {
                     viewModel.updateSelection(effectiveSelection)
                     onCreatePAR()
                 }
 
-                Button("Ver versões") {
+                Button(L10n.string("explorer.toolbar.view_versions")) {
                     viewModel.updateSelection(effectiveSelection)
                     Task { await viewModel.showVersionsForSelectedObject() }
                 }
@@ -836,7 +836,7 @@ private struct ObjectListView: View {
 
             Divider()
 
-            Button(selectedFiles.count == 1 ? "Deletar" : "Deletar selecionados", role: .destructive) {
+            Button(selectedFiles.count == 1 ? L10n.string("explorer.toolbar.delete") : L10n.string("explorer.context.delete_selected"), role: .destructive) {
                 viewModel.updateSelection(effectiveSelection)
                 Task { await viewModel.deleteSelectedObjects() }
             }
@@ -885,87 +885,87 @@ private struct InspectorPanelView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 if let bucket = viewModel.selectedBucket, let details = viewModel.bucketDetails {
-                    InspectorSectionView(title: "Bucket") {
-                        InspectorValueRow(title: "Nome", value: bucket.name)
-                        InspectorValueRow(title: "Namespace", value: details.namespace)
-                        InspectorValueRow(title: "Região", value: viewModel.currentRegionDisplayName)
-                        InspectorValueRow(title: "Criado em", value: details.createdAt.friendlyDateText)
+                    InspectorSectionView(title: L10n.string("explorer.inspector.bucket")) {
+                        InspectorValueRow(title: L10n.string("common.name"), value: bucket.name)
+                        InspectorValueRow(title: L10n.string("common.namespace"), value: details.namespace)
+                        InspectorValueRow(title: L10n.string("common.region"), value: viewModel.currentRegionDisplayName)
+                        InspectorValueRow(title: L10n.string("common.created_at"), value: details.createdAt.friendlyDateText)
                     }
 
-                    InspectorSectionView(title: "Configuração") {
-                        InspectorValueRow(title: "Storage tier", value: details.storageTier ?? "—")
-                        InspectorValueRow(title: "Versioning", value: details.versioning ?? "—")
-                        InspectorValueRow(title: "Public access", value: details.publicAccessType ?? "—")
+                    InspectorSectionView(title: L10n.string("explorer.inspector.configuration")) {
+                        InspectorValueRow(title: L10n.string("bucket.storage_tier"), value: LocalizedDisplayValue.bucketStorageTier(rawValue: details.storageTier))
+                        InspectorValueRow(title: L10n.string("common.versioning"), value: LocalizedDisplayValue.versioning(details.versioning))
+                        InspectorValueRow(title: L10n.string("common.public_access"), value: LocalizedDisplayValue.publicAccess(details.publicAccessType))
                         InspectorValueRow(
-                            title: "Compartment",
+                            title: L10n.string("common.compartment"),
                             value: viewModel.abbreviated(details.compartmentID),
                             copyValue: details.compartmentID
                         )
                     }
                 }
 
-                InspectorSectionView(title: "Objeto selecionado") {
+                InspectorSectionView(title: L10n.string("explorer.inspector.object_selected")) {
                     if viewModel.objectDetailsState == .loading {
                         VStack(alignment: .leading, spacing: 10) {
                             ProgressView()
-                            Text("Carregando detalhes do objeto…")
+                            Text(L10n.string("explorer.inspector.loading_details"))
                                 .font(.subheadline)
                                 .foregroundStyle(theme.textSecondary)
                         }
                     } else if viewModel.selectedObjects.count > 1 {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("\(viewModel.selectedObjects.count) itens selecionados")
+                            Text(L10n.plural("count.selected_items", count: viewModel.selectedObjects.count))
                                 .font(.headline)
                                 .foregroundStyle(theme.textPrimary)
-                            Text("As ações abaixo serão aplicadas aos arquivos selecionados.")
+                            Text(L10n.string("explorer.inspector.multiple_actions"))
                                 .font(.subheadline)
                                 .foregroundStyle(theme.textSecondary)
 
                             HStack(spacing: 10) {
-                                Button("Copiar nomes") {
+                                Button(L10n.string("common.copy_names")) {
                                     viewModel.copySelectedObjectName()
                                 }
                                 .buttonStyle(AppButtonStyle(kind: .secondary))
 
-                                Button("Copiar caminhos") {
+                                Button(L10n.string("common.copy_paths")) {
                                     viewModel.copySelectedObjectPath()
                                 }
                                 .buttonStyle(AppButtonStyle(kind: .secondary))
 
-                                Button("Excluir", role: .destructive) {
+                                Button(L10n.string("common.delete"), role: .destructive) {
                                     Task { await viewModel.deleteSelectedObjects() }
                                 }
                                 .buttonStyle(AppButtonStyle(kind: .destructive))
                             }
                         }
                     } else if let selectedObject = viewModel.selectedPrimaryItem, let metadata = viewModel.selectedObjectMetadata {
-                        InspectorValueRow(title: "Nome", value: selectedObject.name, copyValue: selectedObject.name)
-                        InspectorValueRow(title: "Caminho", value: selectedObject.fullPath, copyValue: selectedObject.fullPath)
-                        InspectorValueRow(title: "Tamanho", value: metadata.size.friendlyByteText)
-                        InspectorValueRow(title: "Tipo", value: metadata.contentType ?? "Arquivo")
-                        InspectorValueRow(title: "Última modificação", value: metadata.modifiedAt.friendlyDateText)
-                        InspectorValueRow(title: "ETag", value: viewModel.abbreviated(metadata.etag), copyValue: metadata.etag)
-                        InspectorValueRow(title: "Tier", value: metadata.storageTier ?? selectedObject.storageTier ?? "—")
-                        InspectorValueRow(title: "Versionamento", value: viewModel.isBucketVersioningEnabled ? "Habilitado" : "Desabilitado")
-                        InspectorValueRow(title: "Versões", value: viewModel.selectedObjectVersionsCountText)
+                        InspectorValueRow(title: L10n.string("common.name"), value: selectedObject.name, copyValue: selectedObject.name)
+                        InspectorValueRow(title: L10n.string("explorer.inspector.path"), value: selectedObject.fullPath, copyValue: selectedObject.fullPath)
+                        InspectorValueRow(title: L10n.string("common.size"), value: metadata.size.friendlyByteText)
+                        InspectorValueRow(title: L10n.string("common.type"), value: metadata.contentType ?? L10n.string("common.file"))
+                        InspectorValueRow(title: L10n.string("explorer.inspector.last_modified"), value: metadata.modifiedAt.friendlyDateText)
+                        InspectorValueRow(title: L10n.string("explorer.inspector.etag"), value: viewModel.abbreviated(metadata.etag), copyValue: metadata.etag)
+                        InspectorValueRow(title: L10n.string("explorer.table.tier"), value: LocalizedDisplayValue.bucketStorageTier(rawValue: metadata.storageTier ?? selectedObject.storageTier))
+                        InspectorValueRow(title: L10n.string("common.versioning"), value: viewModel.isBucketVersioningEnabled ? L10n.string("common.enabled") : L10n.string("common.disabled"))
+                        InspectorValueRow(title: L10n.string("common.versions"), value: viewModel.selectedObjectVersionsCountText)
 
                         HStack(spacing: 10) {
-                            Button("Copiar nome") {
+                            Button(L10n.string("common.copy_name")) {
                                 viewModel.copySelectedObjectName()
                             }
                             .buttonStyle(AppButtonStyle(kind: .secondary))
 
-                            Button("Copiar caminho") {
+                            Button(L10n.string("common.copy_path")) {
                                 viewModel.copySelectedObjectPath()
                             }
                             .buttonStyle(AppButtonStyle(kind: .secondary))
 
-                            Button("Ver versões") {
+                            Button(L10n.string("explorer.toolbar.view_versions")) {
                                 Task { await viewModel.showVersionsForSelectedObject() }
                             }
                             .buttonStyle(AppButtonStyle(kind: .secondary))
 
-                            Button("Excluir", role: .destructive) {
+                            Button(L10n.string("common.delete"), role: .destructive) {
                                 Task { await viewModel.deleteSelectedObjects() }
                             }
                             .buttonStyle(AppButtonStyle(kind: .destructive))
@@ -976,7 +976,7 @@ private struct InspectorPanelView: View {
                             .font(.subheadline)
                             .foregroundStyle(theme.textSecondary)
                     } else {
-                        Text("Selecione um arquivo para ver detalhes no inspector.")
+                        Text(L10n.string("explorer.inspector.select_file"))
                             .font(.subheadline)
                             .foregroundStyle(theme.textSecondary)
                     }
@@ -999,14 +999,14 @@ private struct ObjectVersionsSheet: View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Versões do objeto")
+                    Text(L10n.string("explorer.versions.title"))
                         .font(.title2.weight(.semibold))
                         .foregroundStyle(theme.textPrimary)
-                    Text(viewModel.selectedObject?.name ?? "Objeto selecionado")
+                    Text(viewModel.selectedObject?.name ?? L10n.string("common.object_selected"))
                         .foregroundStyle(theme.textSecondary)
                 }
                 Spacer()
-                Button("Fechar") {
+                Button(L10n.string("common.close")) {
                     dismiss()
                 }
                 .buttonStyle(AppButtonStyle(kind: .secondary))
@@ -1015,60 +1015,60 @@ private struct ObjectVersionsSheet: View {
             Group {
                 switch viewModel.objectVersionsState {
                 case .idle, .loading:
-                    ExplorerLoadingView(title: "Carregando versões do objeto…")
+                    ExplorerLoadingView(title: L10n.string("explorer.versions.loading"))
                 case .disabled:
                     EmptyStateView(
                         systemImage: "clock.badge.xmark",
-                        title: "O versionamento não está habilitado para este bucket.",
-                        message: "Ative o versionamento no bucket para consultar o histórico desse objeto."
+                        title: L10n.string("explorer.versions.disabled.title"),
+                        message: L10n.string("explorer.versions.disabled.message")
                     )
                 case .empty:
                     EmptyStateView(
                         systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90",
-                        title: "Nenhuma versão anterior encontrada para este objeto.",
-                        message: "Quando houver histórico de versões, ele aparecerá aqui."
+                        title: L10n.string("explorer.versions.empty.title"),
+                        message: L10n.string("explorer.versions.empty.message")
                     )
                 case let .error(message):
                     EmptyStateView(
                         systemImage: "exclamationmark.triangle",
-                        title: "Não foi possível carregar as versões",
+                        title: L10n.string("explorer.versions.error.title"),
                         message: message
                     )
                 case .loaded:
                     Table(viewModel.objectVersions) {
-                        TableColumn("Version ID") { version in
+                        TableColumn(L10n.string("common.version_id")) { version in
                             Text(viewModel.abbreviated(version.versionID, prefix: 12, suffix: 8))
                                 .help(version.versionID)
                         }
                         .width(min: 150, ideal: 210)
 
-                        TableColumn("Modificado") { version in
+                        TableColumn(L10n.string("explorer.table.modified")) { version in
                             Text(version.modifiedAt.friendlyDateText)
                                 .foregroundStyle(theme.textSecondary)
                         }
                         .width(min: 170, ideal: 190)
 
-                        TableColumn("Tamanho") { version in
+                        TableColumn(L10n.string("explorer.table.size")) { version in
                             Text(version.size.friendlyByteText)
                                 .foregroundStyle(theme.textSecondary)
                         }
                         .width(min: 90, ideal: 110)
 
-                        TableColumn("ETag") { version in
+                        TableColumn(L10n.string("explorer.inspector.etag")) { version in
                             Text(viewModel.abbreviated(version.etag, prefix: 10, suffix: 6))
                                 .foregroundStyle(theme.textSecondary)
-                                .help(version.etag ?? "—")
+                                .help(version.etag ?? L10n.string("common.not_available"))
                         }
                         .width(min: 110, ideal: 150)
 
-                        TableColumn("Atual") { version in
-                            Text(version.isCurrent ? "Sim" : "—")
+                        TableColumn(L10n.string("common.current")) { version in
+                            Text(LocalizedDisplayValue.yesNo(version.isCurrent, falseUsesDash: true))
                                 .foregroundStyle(version.isCurrent ? BrandColors.success : theme.textSecondary)
                         }
                         .width(min: 60, ideal: 70)
 
-                        TableColumn("Delete marker") { version in
-                            Text(version.isDeleteMarker ? "Sim" : "Não")
+                        TableColumn(L10n.string("common.delete_marker")) { version in
+                            Text(LocalizedDisplayValue.yesNo(version.isDeleteMarker))
                                 .foregroundStyle(version.isDeleteMarker ? BrandColors.warning : theme.textSecondary)
                         }
                         .width(min: 100, ideal: 120)
@@ -1138,7 +1138,7 @@ private struct InspectorValueRow: View {
                             .foregroundStyle(theme.textSecondary)
                     }
                     .buttonStyle(.borderless)
-                    .help("Copiar valor completo")
+                    .help(L10n.string("common.copy_full_value"))
                 }
             }
             Text(value)

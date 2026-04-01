@@ -23,26 +23,26 @@ public enum AppError: LocalizedError, Equatable, Sendable {
              let .wrapped(message):
             return message
         case .cancelled:
-            return "A operação foi cancelada."
+            return L10n.string("error.cancelled")
         }
     }
 
     public var recoverySuggestion: String? {
         switch self {
         case .validation:
-            return "Revise os campos destacados e tente novamente."
+            return L10n.string("error.validation.recovery")
         case .authentication:
-            return "Confira tenancy, user, fingerprint, região e chave privada."
+            return L10n.string("error.authentication.recovery")
         case .network:
-            return "Verifique sua conectividade, a região informada e as permissões da conta."
+            return L10n.string("error.network.recovery")
         case .storage:
-            return "Atualize a visualização e tente novamente. Se persistir, valide as permissões do bucket."
+            return L10n.string("error.storage.recovery")
         case .parsing:
-            return "Confira o formato dos dados retornados pela API ou da chave privada informada."
+            return L10n.string("error.parsing.recovery")
         case .configuration:
-            return "Revise a configuração do perfil e salve novamente."
+            return L10n.string("error.configuration.recovery")
         case .notImplemented:
-            return "Esse fluxo está preparado para evolução futura."
+            return L10n.string("error.not_implemented.recovery")
         case .cancelled:
             return nil
         case .wrapped:

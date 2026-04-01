@@ -1,13 +1,14 @@
 import AppKit
 import Foundation
+import OCIExplorerCore
 import UniformTypeIdentifiers
 
 @MainActor
 enum NativeDialogs {
     static func choosePrivateKeyFile() -> URL? {
         let panel = NSOpenPanel()
-        panel.title = "Selecionar chave privada PEM"
-        panel.prompt = "Usar chave"
+        panel.title = L10n.string("dialog.private_key.title")
+        panel.prompt = L10n.string("dialog.private_key.prompt")
         panel.allowedContentTypes = [.data]
         panel.canChooseDirectories = false
         panel.canChooseFiles = true
@@ -17,8 +18,8 @@ enum NativeDialogs {
 
     static func chooseFiles() -> [URL] {
         let panel = NSOpenPanel()
-        panel.title = "Selecionar arquivos para upload"
-        panel.prompt = "Selecionar"
+        panel.title = L10n.string("dialog.upload_files.title")
+        panel.prompt = L10n.string("dialog.generic.select")
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = true
@@ -28,7 +29,7 @@ enum NativeDialogs {
     static func chooseDirectory(prompt: String) -> URL? {
         let panel = NSOpenPanel()
         panel.title = prompt
-        panel.prompt = "Selecionar"
+        panel.prompt = L10n.string("dialog.generic.select")
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.allowsMultipleSelection = false
@@ -36,7 +37,7 @@ enum NativeDialogs {
     }
 
     @discardableResult
-    static func confirm(title: String, message: String, primary: String = "Confirmar", secondary: String = "Cancelar") -> Bool {
+    static func confirm(title: String, message: String, primary: String = L10n.string("common.confirm"), secondary: String = L10n.string("common.cancel")) -> Bool {
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = title
@@ -55,11 +56,11 @@ enum NativeDialogs {
 
         let alert = NSAlert()
         alert.alertStyle = .warning
-        alert.messageText = "Conflito de nome"
-        alert.informativeText = "O arquivo \(fileName) já existe no destino."
-        alert.addButton(withTitle: "Sobrescrever")
-        alert.addButton(withTitle: "Renomear")
-        alert.addButton(withTitle: "Pular")
+        alert.messageText = L10n.string("dialog.name_conflict.title")
+        alert.informativeText = L10n.string("dialog.name_conflict.message", fileName)
+        alert.addButton(withTitle: L10n.string("dialog.name_conflict.overwrite"))
+        alert.addButton(withTitle: L10n.string("dialog.name_conflict.rename"))
+        alert.addButton(withTitle: L10n.string("dialog.name_conflict.skip"))
         switch alert.runModal() {
         case .alertFirstButtonReturn:
             return candidate

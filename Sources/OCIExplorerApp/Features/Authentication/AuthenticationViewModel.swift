@@ -21,7 +21,7 @@ enum AuthenticationField: Hashable {
 
 struct AuthenticationDraft: Equatable {
     var selectedProfileID: UUID?
-    var profileName = "Perfil OCI"
+    var profileName = L10n.string("auth.field.profile_name.default")
     var method: AuthenticationMethod = .apiKey
     var tenancyOCID = ""
     var userOCID = ""
@@ -124,7 +124,7 @@ final class AuthenticationViewModel: ObservableObject {
             } else if !draft.privateKeyPath.isEmpty {
                 draft.privateKeyPEM = try String(contentsOfFile: draft.privateKeyPath)
             }
-            connectionStatus = "Perfil carregado."
+            connectionStatus = L10n.string("auth.profile.loaded")
         } catch {
             errorMessage = AppError.from(error).localizedDescription
         }
@@ -143,14 +143,14 @@ final class AuthenticationViewModel: ObservableObject {
     }
 
     var editorTitle: String {
-        mode == .editingProfile ? "Editar perfil" : "Novo perfil"
+        mode == .editingProfile ? L10n.string("auth.editor.edit_title") : L10n.string("auth.editor.new_title")
     }
 
     var selectedProfileSummary: [(String, String)] {
         guard let profile = selectedProfile else { return [] }
         return [
-            ("Região", profile.region),
-            ("Método", profile.method.displayName),
+            (L10n.string("common.region"), profile.region),
+            (L10n.string("common.method"), profile.method.displayName),
             ("Tenancy", abbreviated(profile.tenancyOCID))
         ]
     }
@@ -209,7 +209,7 @@ final class AuthenticationViewModel: ObservableObject {
             let savedProfile = try persistProfile(profile)
             loadProfiles()
             selectProfile(savedProfile)
-            connectionStatus = "Perfil salvo com sucesso."
+            connectionStatus = L10n.string("auth.profile.saved")
             mode = .selectingProfile
         } catch {
             errorMessage = AppError.from(error).localizedDescription
@@ -230,7 +230,7 @@ final class AuthenticationViewModel: ObservableObject {
     func duplicateSelectedProfile() {
         guard let profile = profiles.first(where: { $0.id == draft.selectedProfileID }) else { return }
         let duplicated = AuthProfile(
-            name: "\(profile.name) Copy",
+            name: profile.name + L10n.string("auth.profile.copy_suffix"),
             method: profile.method,
             tenancyOCID: profile.tenancyOCID,
             userOCID: profile.userOCID,
@@ -255,9 +255,9 @@ final class AuthenticationViewModel: ObservableObject {
     func deleteSelectedProfile() {
         guard let profileID = draft.selectedProfileID else { return }
         guard NativeDialogs.confirm(
-            title: "Remover perfil salvo?",
-            message: "As credenciais salvas no Keychain para este perfil também serão removidas.",
-            primary: "Remover"
+            title: L10n.string("auth.profile.remove.title"),
+            message: L10n.string("auth.profile.remove.message"),
+            primary: L10n.string("auth.remove_profile")
         ) else {
             return
         }
@@ -283,7 +283,7 @@ final class AuthenticationViewModel: ObservableObject {
         do {
             let (_, config) = try buildProfileAndConfig()
             let result = try await objectStorageService.testConnection(using: config)
-            connectionStatus = result.message + " Namespace: \(result.resolvedNamespace)"
+            connectionStatus = L10n.string("auth.connection.namespace", result.message, result.resolvedNamespace)
             await loadSubscribedRegions(using: config)
         } catch {
             errorMessage = AppError.from(error).localizedDescription
@@ -348,20 +348,20 @@ final class AuthenticationViewModel: ObservableObject {
                 logger.log(
                     .warning,
                     category: "Auth",
-                    message: "Sessão iniciada, mas não foi possível persistir o perfil",
+                    message: L10n.string("auth.log.session_started_profile_not_saved"),
                     metadata: [
                         "profile": connectedProfile.name,
                         "error": appError.localizedDescription
                     ]
                 )
-                connectionStatus = "\(connection.message) As credenciais não puderam ser salvas neste ambiente, mas a sessão atual foi iniciada."
+                connectionStatus = L10n.string("auth.connection.persist_warning", connection.message)
             }
         }
 
         if connectionStatus == nil {
             connectionStatus = connection.message
         }
-        logger.log(.info, category: "Auth", message: "Sessão OCI iniciada", metadata: ["profile": connectedProfile.name])
+        logger.log(.info, category: "Auth", message: L10n.string("auth.log.session_started"), metadata: ["profile": connectedProfile.name])
 
         return ExplorerSession(profile: connectedProfile, auth: connectedAuth, connection: connection)
     }
@@ -369,7 +369,7 @@ final class AuthenticationViewModel: ObservableObject {
     private func buildProfileAndConfig() throws -> (AuthProfile, OCIAuthenticationConfig) {
         validationErrors = validateDraft()
         guard validationErrors.isEmpty else {
-            throw AppError.validation("Revise os campos destacados antes de continuar.")
+            throw AppError.validation(L10n.string("auth.validation.review_fields"))
         }
 
         if draft.privateKeyPEM.trimmed.isEmpty, !draft.privateKeyPath.trimmed.isEmpty {
@@ -420,7 +420,7 @@ final class AuthenticationViewModel: ObservableObject {
             }
         } catch {
             regions = []
-            regionError = "Não foi possível carregar as regiões automaticamente"
+            regionError = L10n.string("auth.region.load_failed")
             draft.isManualRegionEntry = true
         }
     }
@@ -428,23 +428,23 @@ final class AuthenticationViewModel: ObservableObject {
     private func validateDraft() -> [AuthenticationField: String] {
         var errors: [AuthenticationField: String] = [:]
 
-        if let message = validationMessage(for: { try Validators.validateRequired(draft.profileName, fieldName: "Nome do perfil") }) {
+        if let message = validationMessage(for: { try Validators.validateRequired(draft.profileName, fieldName: L10n.string("auth.field.profile_name")) }) {
             errors[.profileName] = message
         }
-        if let message = validationMessage(for: { try Validators.validateOCID(draft.tenancyOCID, fieldName: "Tenancy OCID") }) {
+        if let message = validationMessage(for: { try Validators.validateOCID(draft.tenancyOCID, fieldName: L10n.string("auth.field.tenancy_ocid")) }) {
             errors[.tenancyOCID] = message
         }
-        if let message = validationMessage(for: { try Validators.validateOCID(draft.userOCID, fieldName: "User OCID") }) {
+        if let message = validationMessage(for: { try Validators.validateOCID(draft.userOCID, fieldName: L10n.string("auth.field.user_ocid")) }) {
             errors[.userOCID] = message
         }
-        if let message = validationMessage(for: { try Validators.validateRequired(draft.fingerprint, fieldName: "Fingerprint") }) {
+        if let message = validationMessage(for: { try Validators.validateRequired(draft.fingerprint, fieldName: L10n.string("auth.field.fingerprint")) }) {
             errors[.fingerprint] = message
         }
-        if let message = validationMessage(for: { try Validators.validateRequired(draft.region, fieldName: "Region") }) {
+        if let message = validationMessage(for: { try Validators.validateRequired(draft.region, fieldName: L10n.string("common.region")) }) {
             errors[.region] = message
         }
         if draft.privateKeyPEM.trimmed.isEmpty, draft.privateKeyPath.trimmed.isEmpty {
-            errors[.privateKey] = "Selecione um arquivo PEM ou importe a chave privada."
+            errors[.privateKey] = L10n.string("auth.validation.private_key_required")
         }
 
         return errors

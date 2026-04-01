@@ -6,6 +6,7 @@ APP_NAME="OCI Object Storage Explorer"
 BUNDLE_ID="com.paulosartori.oci-object-storage-explorer"
 EXECUTABLE_NAME="OCIObjectStorageExplorer"
 APP_ICON_NAME="AppIcon"
+APP_VERSION="${APP_VERSION:-1.1.0}"
 RELEASE_DIR="$ROOT_DIR/.build/arm64-apple-macosx/release"
 RESOURCE_BUNDLE_NAME="OCIObjectStorageExplorer_OCIExplorerApp.bundle"
 RESOURCE_BUNDLE_PATH="$RELEASE_DIR/$RESOURCE_BUNDLE_NAME"
@@ -79,7 +80,7 @@ cat > "$CONTENTS_DIR/Info.plist" <<PLIST
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
-  <string>1.0.0</string>
+  <string>$APP_VERSION</string>
   <key>CFBundleVersion</key>
   <string>$BUILD_VERSION</string>
   <key>LSApplicationCategoryType</key>

@@ -11,19 +11,19 @@ struct TransferQueueView: View {
         let theme = AppTheme.current(for: colorScheme)
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Fila de transferências")
+                Text(L10n.string("transfers.title"))
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(theme.textPrimary)
                 Spacer()
                 if coordinator.hasActiveTransfers {
-                    StatusBadge(title: "Processando", kind: .info)
+                    StatusBadge(title: L10n.string("transfers.processing"), kind: .info)
                 }
-                Button("Fechar") {
+                Button(L10n.string("common.close")) {
                     dismiss()
                 }
                 .buttonStyle(AppButtonStyle(kind: .secondary))
                 .keyboardShortcut(.cancelAction)
-                Button("Limpar concluídas") {
+                Button(L10n.string("transfers.clear_completed")) {
                     coordinator.clearCompleted()
                 }
                 .buttonStyle(AppButtonStyle(kind: .secondary))
@@ -56,13 +56,13 @@ struct TransferQueueView: View {
                     }
                     HStack {
                         if record.status == .running {
-                            Button("Cancelar") {
+                            Button(L10n.string("common.cancel")) {
                                 coordinator.cancel(recordID: record.id)
                             }
                             .buttonStyle(AppButtonStyle(kind: .destructive))
                         }
                         if record.status == .failed || record.status == .cancelled {
-                            Button("Retry") {
+                            Button(L10n.string("transfers.retry")) {
                                 coordinator.retry(recordID: record.id)
                             }
                             .buttonStyle(AppButtonStyle(kind: .secondary))
@@ -80,18 +80,18 @@ struct TransferQueueView: View {
         let theme = AppTheme.current(for: colorScheme)
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 16) {
-                summaryPill(title: "Na fila", value: coordinator.queuedCount.description)
-                summaryPill(title: "Em andamento", value: coordinator.runningCount.description)
-                summaryPill(title: "Concluídos", value: coordinator.completedCount.description)
-                summaryPill(title: "Falharam", value: coordinator.failedCount.description)
+                summaryPill(title: L10n.string("transfers.summary.queued"), value: coordinator.queuedCount.description)
+                summaryPill(title: L10n.string("transfers.summary.running"), value: coordinator.runningCount.description)
+                summaryPill(title: L10n.string("transfers.summary.completed"), value: coordinator.completedCount.description)
+                summaryPill(title: L10n.string("transfers.summary.failed"), value: coordinator.failedCount.description)
             }
 
             ProgressView(value: coordinator.overallProgress)
                 .progressViewStyle(.linear)
 
             Text(coordinator.hasActiveTransfers
-                 ? "Progresso global: \(Int((coordinator.overallProgress * 100).rounded()))%"
-                 : "Nenhuma transferência ativa no momento.")
+                 ? L10n.string("transfers.summary.progress", Int((coordinator.overallProgress * 100).rounded()))
+                 : L10n.string("transfers.summary.idle"))
                 .font(.caption)
                 .foregroundStyle(theme.textSecondary)
         }
@@ -134,31 +134,31 @@ struct TransferQueueView: View {
     private func title(for status: TransferStatus) -> String {
         switch status {
         case .queued:
-            return "Pendente"
+            return L10n.string("transfers.status.queued")
         case .running:
-            return "Enviando"
+            return L10n.string("transfers.status.running")
         case .completed:
-            return "Concluído"
+            return L10n.string("transfers.status.completed")
         case .failed:
-            return "Falhou"
+            return L10n.string("transfers.status.failed")
         case .cancelled:
-            return "Cancelado"
+            return L10n.string("transfers.status.cancelled")
         }
     }
 
     private func progressLabel(for record: TransferRecord) -> String {
         switch record.status {
         case .queued:
-            return "Aguardando na fila"
+            return L10n.string("transfers.progress.waiting")
         case .running:
             let percentage = Int((record.progress * 100).rounded())
-            return percentage > 0 ? "\(percentage)% concluído" : "Preparando transferência…"
+            return percentage > 0 ? L10n.string("transfers.progress.percent", percentage) : L10n.string("transfers.progress.preparing")
         case .completed:
-            return "Transferência concluída"
+            return L10n.string("transfers.progress.completed")
         case .failed:
-            return "Falha na transferência"
+            return L10n.string("transfers.progress.failed")
         case .cancelled:
-            return "Transferência cancelada"
+            return L10n.string("transfers.progress.cancelled")
         }
     }
 }

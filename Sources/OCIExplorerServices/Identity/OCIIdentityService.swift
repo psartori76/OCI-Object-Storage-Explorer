@@ -59,13 +59,13 @@ public final class OCIIdentityService: OCIIdentityServiceProtocol, @unchecked Se
                 await logger.log(
                     .warning,
                     category: "Identity",
-                    message: "Falha ao consultar regiões subscribed.",
+                    message: L10n.string("service.identity.lookup_failed"),
                     metadata: ["region": region, "error": AppError.from(error).localizedDescription]
                 )
             }
         }
 
-        throw lastError ?? AppError.network("Não foi possível carregar as regiões subscribed do tenancy.")
+        throw lastError ?? AppError.network(L10n.string("service.identity.load_failed"))
     }
 }
 

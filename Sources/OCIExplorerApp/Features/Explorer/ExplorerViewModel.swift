@@ -146,11 +146,11 @@ final class ExplorerViewModel: ObservableObject {
     }
 
     var currentLocationTitle: String {
-        selectedBucket?.name ?? "Explorador"
+        selectedBucket?.name ?? L10n.string("explorer.navigation.title")
     }
 
     var currentSearchPlaceholder: String {
-        "Buscar neste bucket"
+        L10n.string("explorer.search.placeholder")
     }
 
     var canDownloadSelection: Bool {
@@ -179,50 +179,50 @@ final class ExplorerViewModel: ObservableObject {
     }
 
     var selectedObjectVersionsCountText: String {
-        guard selectedObject != nil else { return "—" }
+        guard selectedObject != nil else { return L10n.string("common.not_available") }
         if versionsTargetObjectName != selectedObject?.fullPath {
-            return isBucketVersioningEnabled ? "Carregue para ver" : "Desabilitado"
+            return isBucketVersioningEnabled ? L10n.string("explorer.value.load_to_view") : L10n.string("common.disabled")
         }
         switch objectVersionsState {
         case .disabled:
-            return "Desabilitado"
+            return L10n.string("common.disabled")
         case .empty:
-            return "Nenhuma versão anterior"
+            return L10n.string("explorer.value.no_previous_versions")
         case .loaded:
-            return objectVersions.count == 1 ? "1 versão" : "\(objectVersions.count) versões"
+            return L10n.plural("count.object_versions", count: objectVersions.count)
         case .loading:
-            return "Carregando…"
+            return L10n.string("common.loading")
         case .error:
-            return "Indisponível"
+            return L10n.string("explorer.value.unavailable")
         case .idle:
-            return "—"
+            return L10n.string("common.not_available")
         }
     }
 
     var emptyStateTitle: String {
         if buckets.isEmpty {
-            return "Nenhum bucket nesta região"
+            return L10n.string("explorer.region.empty.title")
         }
         if !searchText.isEmpty {
-            return "Nenhum resultado encontrado"
+            return L10n.string("explorer.empty.no_results.title")
         }
         if currentPrefix.isEmpty {
-            return "Este bucket está vazio"
+            return L10n.string("explorer.empty.bucket_empty.title")
         }
-        return "Esta pasta está vazia"
+        return L10n.string("explorer.empty.folder_empty.title")
     }
 
     var emptyStateMessage: String {
         if buckets.isEmpty {
-            return "Esta região não possui buckets disponíveis para a conta atual. Use o seletor de região na barra lateral para trocar de contexto ou crie um novo bucket."
+            return L10n.string("explorer.empty.no_buckets.message")
         }
         if !searchText.isEmpty {
-            return "Tente ajustar a busca ou limpar o filtro para ver outros objetos."
+            return L10n.string("explorer.empty.no_results.message")
         }
         if currentPrefix.isEmpty {
-            return "Faça upload de arquivos ou crie uma pasta virtual para começar a organizar o conteúdo."
+            return L10n.string("explorer.empty.bucket_empty.message")
         }
-        return "Envie novos arquivos para este prefixo ou volte para um nível anterior pelo breadcrumb."
+        return L10n.string("explorer.empty.folder_empty.message")
     }
 
     func bootstrap() async {
@@ -365,7 +365,7 @@ final class ExplorerViewModel: ObservableObject {
         do {
             clearBanner()
             _ = try await service.createBucket(request, using: currentAuth)
-            toastMessage = "Bucket criado com sucesso."
+            toastMessage = L10n.string("explorer.toast.bucket_created")
             await refreshBuckets()
         } catch {
             handle(error, context: .createBucket)
@@ -375,15 +375,15 @@ final class ExplorerViewModel: ObservableObject {
     func deleteSelectedBucket() async {
         guard let bucket = selectedBucket else { return }
         guard NativeDialogs.confirm(
-            title: "Excluir bucket \(bucket.name)?",
-            message: "A exclusão só terá sucesso se o bucket estiver vazio. Essa ação não pode ser desfeita.",
-            primary: "Excluir"
+            title: L10n.string("explorer.confirm.delete_bucket.title", bucket.name),
+            message: L10n.string("explorer.confirm.delete_bucket.message"),
+            primary: L10n.string("common.delete")
         ) else {
             return
         }
         do {
             try await service.deleteBucket(named: bucket.name, using: currentAuth)
-            toastMessage = "Bucket removido."
+            toastMessage = L10n.string("explorer.toast.bucket_deleted")
             selectedBucketID = nil
             await refreshBuckets()
         } catch {
@@ -398,11 +398,11 @@ final class ExplorerViewModel: ObservableObject {
         let isSingleObject = objectsToDelete.count == 1
         let previewNames = objectsToDelete.prefix(3).map(\.name).joined(separator: ", ")
         guard NativeDialogs.confirm(
-            title: isSingleObject ? "Tem certeza que deseja excluir este objeto?" : "Tem certeza que deseja excluir os objetos selecionados?",
+            title: isSingleObject ? L10n.string("explorer.confirm.delete_objects.single.title") : L10n.string("explorer.confirm.delete_objects.multiple.title"),
             message: isSingleObject
-                ? "Nome do objeto: \(objectsToDelete[0].name)"
-                : "Itens selecionados: \(objectsToDelete.count)\n\(previewNames)\(objectsToDelete.count > 3 ? "…" : "")",
-            primary: "Excluir"
+                ? L10n.string("explorer.confirm.delete_objects.single.message", objectsToDelete[0].name)
+                : L10n.string("explorer.confirm.delete_objects.multiple.message", objectsToDelete.count, previewNames, objectsToDelete.count > 3 ? "…" : ""),
+            primary: L10n.string("common.delete")
         ) else {
             return
         }
@@ -442,15 +442,15 @@ final class ExplorerViewModel: ObservableObject {
         }
 
         if failedCount == 0 {
-            toastMessage = isSingleObject ? "Objeto removido com sucesso." : "\(deletedIDs.count) objetos removidos com sucesso."
+            toastMessage = isSingleObject ? L10n.string("explorer.toast.object_deleted") : L10n.plural("count.objects_deleted_success", count: deletedIDs.count)
         } else if !deletedIDs.isEmpty {
             banner = ExplorerBanner(
-                title: "Alguns objetos não puderam ser excluídos",
-                message: "Removidos: \(deletedIDs.count). Falharam: \(failedCount).",
+                title: L10n.string("explorer.banner.partial_delete.title"),
+                message: L10n.string("explorer.banner.partial_delete.message", deletedIDs.count, failedCount),
                 isError: true
             )
         } else {
-            handle(AppError.network("Falha ao excluir os objetos selecionados."), context: .deleteObject, affectsContentState: false)
+            handle(AppError.network(L10n.string("explorer.error.delete_selected_objects")), context: .deleteObject, affectsContentState: false)
         }
     }
 
@@ -470,9 +470,9 @@ final class ExplorerViewModel: ObservableObject {
             let objectName = currentPrefix + fileURL.lastPathComponent
             if existingPaths.contains(objectName) {
                 let overwrite = NativeDialogs.confirm(
-                    title: "Sobrescrever \(fileURL.lastPathComponent)?",
-                    message: "Já existe um objeto com esse nome no destino atual.",
-                    primary: "Sobrescrever"
+                    title: L10n.string("explorer.confirm.overwrite_object.title", fileURL.lastPathComponent),
+                    message: L10n.string("explorer.confirm.overwrite_object.message"),
+                    primary: L10n.string("dialog.name_conflict.overwrite")
                 )
                 if !overwrite { continue }
             }
@@ -485,7 +485,7 @@ final class ExplorerViewModel: ObservableObject {
             queuedCount += 1
         }
         if queuedCount > 0 {
-            toastMessage = queuedCount == 1 ? "Upload iniciado." : "\(queuedCount) uploads iniciados."
+            toastMessage = L10n.plural("count.uploads_started", count: queuedCount)
         }
     }
 
@@ -507,7 +507,7 @@ final class ExplorerViewModel: ObservableObject {
                 contentType: "application/x-directory",
                 using: currentAuth
             ) { _ in }
-            toastMessage = "Pasta virtual criada."
+            toastMessage = L10n.string("explorer.toast.virtual_folder_created")
             await refreshCurrentPrefix()
         } catch {
             try? FileManager.default.removeItem(at: tempURL)
@@ -519,7 +519,7 @@ final class ExplorerViewModel: ObservableObject {
         guard let bucketName = selectedBucket?.name else { return }
         let objects = selectedFileItems
         guard !objects.isEmpty else { return }
-        guard let directory = NativeDialogs.chooseDirectory(prompt: "Escolher pasta de destino") else { return }
+        guard let directory = NativeDialogs.chooseDirectory(prompt: L10n.string("dialog.download.choose_destination")) else { return }
 
         for item in objects {
             guard let destination = NativeDialogs.resolveDownloadDestination(
@@ -530,7 +530,7 @@ final class ExplorerViewModel: ObservableObject {
             }
             transferCoordinator.download(bucketName: bucketName, objectName: item.fullPath, destinationURL: destination)
         }
-        toastMessage = "\(objects.count) download(s) adicionados à fila."
+        toastMessage = L10n.plural("count.downloads_added_queue", count: objects.count)
     }
 
     func showVersionsForSelectedObject() async {
@@ -557,28 +557,28 @@ final class ExplorerViewModel: ObservableObject {
             objectVersionsState = versions.isEmpty ? .empty : .loaded
         } catch {
             objectVersions = []
-            objectVersionsError = "Não foi possível carregar as versões deste objeto."
-            objectVersionsState = .error(objectVersionsError ?? "Não foi possível carregar as versões deste objeto.")
-            logger.log(.warning, category: "Explorer", message: "Falha ao listar versões do objeto", metadata: ["object": selectedObject.fullPath, "error": AppError.from(error).localizedDescription])
+            objectVersionsError = L10n.string("explorer.error.object_versions")
+            objectVersionsState = .error(objectVersionsError ?? L10n.string("explorer.error.object_versions"))
+            logger.log(.warning, category: "Explorer", message: L10n.string("explorer.log.object_versions"), metadata: ["object": selectedObject.fullPath, "error": AppError.from(error).localizedDescription])
         }
     }
 
     func copySelectedObjectName() {
         guard !selectedObjects.isEmpty else { return }
         NativeDialogs.copyToPasteboard(selectedObjects.map(\.name).joined(separator: "\n"))
-        toastMessage = selectedObjects.count == 1 ? "Nome do objeto copiado." : "Nomes dos objetos copiados."
+        toastMessage = selectedObjects.count == 1 ? L10n.string("explorer.toast.object_name_copied") : L10n.string("explorer.toast.object_names_copied")
     }
 
     func copySelectedObjectPath() {
         guard !selectedObjects.isEmpty else { return }
         NativeDialogs.copyToPasteboard(selectedObjects.map(\.fullPath).joined(separator: "\n"))
-        toastMessage = selectedObjects.count == 1 ? "Caminho do objeto copiado." : "Caminhos dos objetos copiados."
+        toastMessage = selectedObjects.count == 1 ? L10n.string("explorer.toast.object_path_copied") : L10n.string("explorer.toast.object_paths_copied")
     }
 
     func copySelectedBucketName() {
         guard let bucket = selectedBucket else { return }
         NativeDialogs.copyToPasteboard(bucket.name)
-        toastMessage = "Nome do bucket copiado."
+        toastMessage = L10n.string("explorer.toast.bucket_name_copied")
     }
 
     func clearBanner() {
@@ -601,7 +601,7 @@ final class ExplorerViewModel: ObservableObject {
     }
 
     func abbreviated(_ value: String?, prefix: Int = 16, suffix: Int = 8) -> String {
-        guard let value else { return "—" }
+        guard let value else { return L10n.string("common.not_available") }
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmed.count > prefix + suffix + 3 else { return trimmed }
         return "\(trimmed.prefix(prefix))...\(trimmed.suffix(suffix))"
@@ -676,7 +676,7 @@ final class ExplorerViewModel: ObservableObject {
             guard metadataRequestID == requestID, selectedPrimaryItem?.id == item.id else { return }
             selectedObjectMetadata = nil
             objectDetailsState = .failed
-            objectDetailsError = "Não foi possível carregar os detalhes deste objeto."
+            objectDetailsError = L10n.string("explorer.error.object_details")
             logger.log(.warning, category: "Explorer", message: "\(ErrorContext.loadMetadata.logLabel): \(AppError.from(error).localizedDescription)")
         }
     }
@@ -702,20 +702,20 @@ final class ExplorerViewModel: ObservableObject {
             break
         case .running:
             if record.direction == .upload {
-                toastMessage = "Upload em andamento: \(record.displayName)"
+                toastMessage = L10n.string("explorer.toast.upload_running", record.displayName)
             }
         case .completed:
             if record.direction == .upload {
-                toastMessage = "Upload concluído: \(record.displayName)"
+                toastMessage = L10n.string("explorer.toast.upload_completed", record.displayName)
                 Task { await refreshAfterUploadCompletion(record) }
             }
         case .failed:
             if record.direction == .upload {
-                toastMessage = record.errorMessage ?? "Falha no upload."
+                toastMessage = record.errorMessage ?? L10n.string("explorer.toast.upload_failed")
             }
         case .cancelled:
             if record.direction == .upload {
-                toastMessage = "Upload cancelado: \(record.displayName)"
+                toastMessage = L10n.string("explorer.toast.upload_cancelled", record.displayName)
             }
         }
     }
@@ -854,57 +854,57 @@ private enum ErrorContext: Equatable {
     var userTitle: String {
         switch self {
         case .loadBuckets:
-            return "Não foi possível carregar os buckets"
+            return L10n.string("explorer.error.load_buckets.title")
         case .loadObjects:
-            return "Não foi possível carregar os objetos"
+            return L10n.string("explorer.error.load_objects.title")
         case .loadMetadata:
-            return "Não foi possível carregar os detalhes do objeto"
+            return L10n.string("explorer.error.load_metadata.title")
         case .createBucket:
-            return "Não foi possível criar o bucket"
+            return L10n.string("explorer.error.create_bucket.title")
         case .deleteBucket:
-            return "Não foi possível excluir o bucket"
+            return L10n.string("explorer.error.delete_bucket.title")
         case .deleteObject:
-            return "Não foi possível excluir o objeto"
+            return L10n.string("explorer.error.delete_object.title")
         case .createFolder:
-            return "Não foi possível criar a pasta virtual"
+            return L10n.string("explorer.error.create_folder.title")
         }
     }
 
     var userMessage: String {
         switch self {
         case .loadBuckets:
-            return "Confira sua conexão, permissões no OCI e tente novamente."
+            return L10n.string("explorer.error.load_buckets.message")
         case .loadObjects:
-            return "Tente atualizar o bucket atual para carregar os objetos novamente."
+            return L10n.string("explorer.error.load_objects.context_message")
         case .loadMetadata:
-            return "Selecione o item novamente ou atualize a pasta atual."
+            return L10n.string("explorer.error.load_metadata.message")
         case .createBucket:
-            return "Revise o nome, o compartment e suas permissões antes de tentar de novo."
+            return L10n.string("explorer.error.create_bucket.message")
         case .deleteBucket:
-            return "O bucket pode não estar vazio ou sua conta pode não ter permissão para excluí-lo."
+            return L10n.string("explorer.error.delete_bucket.message")
         case .deleteObject:
-            return "Tente novamente em alguns instantes."
+            return L10n.string("explorer.error.delete_object.message")
         case .createFolder:
-            return "Revise o nome da pasta e tente novamente."
+            return L10n.string("explorer.error.create_folder.message")
         }
     }
 
     var logLabel: String {
         switch self {
         case .loadBuckets:
-            return "Falha ao carregar buckets"
+            return L10n.string("explorer.log.load_buckets")
         case .loadObjects:
-            return "Falha ao carregar objetos"
+            return L10n.string("explorer.log.load_objects")
         case .loadMetadata:
-            return "Falha ao carregar metadados"
+            return L10n.string("explorer.log.load_metadata")
         case .createBucket:
-            return "Falha ao criar bucket"
+            return L10n.string("explorer.log.create_bucket")
         case .deleteBucket:
-            return "Falha ao deletar bucket"
+            return L10n.string("explorer.log.delete_bucket")
         case .deleteObject:
-            return "Falha ao deletar objeto"
+            return L10n.string("explorer.log.delete_object")
         case .createFolder:
-            return "Falha ao criar pasta"
+            return L10n.string("explorer.log.create_folder")
         }
     }
 }

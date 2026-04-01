@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import OCIExplorerCore
 
 struct AppPanelCard<Content: View>: View {
     let title: String?
@@ -292,7 +293,7 @@ struct AppFileField: View {
         VStack(alignment: .leading, spacing: 8) {
             AppFieldLabel(title: title, helper: nil)
             HStack(spacing: 12) {
-                Text(path.isEmpty ? "Nenhum arquivo selecionado" : path)
+                Text(path.isEmpty ? L10n.string("auth.field.pem_file.none") : path)
                     .foregroundStyle(path.isEmpty ? theme.textTertiary : theme.textPrimary)
                     .lineLimit(1)
                     .truncationMode(.middle)

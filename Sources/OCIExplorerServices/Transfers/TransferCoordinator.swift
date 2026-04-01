@@ -221,9 +221,9 @@ public final class TransferCoordinator: ObservableObject {
     private func transferLogMessage(for replay: TransferReplayDescriptor) -> String {
         switch replay {
         case .upload:
-            return "Upload falhou"
+            return L10n.string("transfer.log.upload_failed")
         case .download:
-            return "Download falhou"
+            return L10n.string("transfer.log.download_failed")
         }
     }
 
@@ -243,23 +243,23 @@ public final class TransferCoordinator: ObservableObject {
         case .authentication:
             switch replay {
             case .upload:
-                return "Você não tem permissão para enviar arquivos para este bucket."
+                return L10n.string("transfer.error.auth.upload")
             case .download:
-                return "Você não tem permissão para baixar este objeto."
+                return L10n.string("transfer.error.auth.download")
             }
         case .network:
             switch replay {
             case .upload:
-                return "A conexão com o OCI falhou durante o upload."
+                return L10n.string("transfer.error.network.upload")
             case .download:
-                return "A conexão com o OCI falhou durante o download."
+                return L10n.string("transfer.error.network.download")
             }
         default:
             switch replay {
             case .upload:
-                return "Falha ao enviar o arquivo para o bucket."
+                return L10n.string("transfer.error.generic.upload")
             case .download:
-                return "Falha ao baixar o arquivo selecionado."
+                return L10n.string("transfer.error.generic.download")
             }
         }
     }

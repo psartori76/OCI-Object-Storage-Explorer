@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import OCIExplorerCore
 import OCIExplorerShared
 
 @main
@@ -12,7 +13,7 @@ struct OCIObjectStorageExplorerApp: App {
     }
 
     var body: some Scene {
-        WindowGroup("OCI Object Storage Explorer") {
+        WindowGroup(L10n.string("app.title")) {
             RootView(viewModel: viewModel)
                 .frame(minWidth: 1160, minHeight: 760)
         }
@@ -80,10 +81,10 @@ private struct SplashView: View {
                 SplashLogoView()
 
                 VStack(spacing: 8) {
-                    Text("OCI Explorer")
+                    Text(L10n.string("app.splash.title"))
                         .font(.largeTitle.weight(.bold))
                         .foregroundStyle(.white)
-                    Text("Manage your Object Storage with simplicity and power")
+                    Text(L10n.string("app.splash.subtitle"))
                         .font(.body)
                         .foregroundStyle(.white.opacity(0.75))
                 }

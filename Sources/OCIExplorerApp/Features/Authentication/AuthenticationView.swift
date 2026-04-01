@@ -74,12 +74,12 @@ struct AuthenticationView: View {
 
     private func header(theme: AppThemePalette) -> some View {
         VStack(spacing: 12) {
-            Text("OCI Object Storage Explorer")
+            Text(L10n.string("auth.title"))
                 .font(.system(size: 40, weight: .bold, design: .rounded))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(theme.textPrimary)
 
-            Text("Acesse seus buckets e objetos no OCI com uma experiência nativa para macOS.")
+            Text(L10n.string("auth.subtitle"))
                 .font(.title3)
                 .foregroundStyle(theme.textSecondary)
                 .multilineTextAlignment(.center)
@@ -90,7 +90,7 @@ struct AuthenticationView: View {
     private func savedProfilesContent(theme: AppThemePalette) -> some View {
         HStack(alignment: .top, spacing: 24) {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Perfis salvos")
+                Text(L10n.string("auth.saved_profiles"))
                     .font(.headline)
                     .foregroundStyle(theme.textPrimary)
 
@@ -116,7 +116,7 @@ struct AuthenticationView: View {
             Divider()
 
             VStack(alignment: .leading, spacing: 16) {
-                Text("Perfil selecionado")
+                Text(L10n.string("auth.selected_profile"))
                     .font(.headline)
                     .foregroundStyle(theme.textPrimary)
 
@@ -139,12 +139,12 @@ struct AuthenticationView: View {
                         }
                     }
 
-                    Text("Os detalhes técnicos do OCI só aparecem quando você escolher editar ou criar um perfil.")
+                    Text(L10n.string("auth.selected_profile.helper"))
                         .font(.footnote)
                         .foregroundStyle(theme.textTertiary)
                         .padding(.top, 4)
                 } else {
-                    Text("Escolha um perfil salvo para conectar-se rapidamente.")
+                    Text(L10n.string("auth.selected_profile.empty"))
                         .font(.body)
                         .foregroundStyle(theme.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -156,10 +156,10 @@ struct AuthenticationView: View {
 
     private func emptyProfilesContent(theme: AppThemePalette) -> some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Perfis salvos")
+            Text(L10n.string("auth.saved_profiles"))
                 .font(.headline)
                 .foregroundStyle(theme.textPrimary)
-            Text("Nenhum perfil configurado ainda. Crie um novo perfil para começar a se conectar ao OCI Object Storage.")
+            Text(L10n.string("auth.empty_profiles"))
                 .font(.body)
                 .foregroundStyle(theme.textSecondary)
         }
@@ -176,25 +176,25 @@ struct AuthenticationView: View {
                     ProgressView()
                         .controlSize(.small)
                 } else {
-                    Text("Conectar")
+                    Text(L10n.string("auth.connect"))
                         .frame(minWidth: 110)
                 }
             }
             .buttonStyle(AppButtonStyle(kind: .primary))
             .disabled(viewModel.selectedProfile == nil || viewModel.isConnecting || viewModel.isTestingConnection)
 
-            Button("Novo perfil") {
+            Button(L10n.string("auth.new_profile")) {
                 viewModel.startCreatingProfile()
             }
             .buttonStyle(AppButtonStyle(kind: .secondary))
 
-            Button("Editar perfil") {
+            Button(L10n.string("auth.edit_profile")) {
                 viewModel.startEditingSelectedProfile()
             }
             .buttonStyle(AppButtonStyle(kind: .secondary))
             .disabled(viewModel.selectedProfile == nil)
 
-            Button("Remover perfil", role: .destructive) {
+            Button(L10n.string("auth.remove_profile"), role: .destructive) {
                 viewModel.deleteSelectedProfile()
             }
             .buttonStyle(AppButtonStyle(kind: .destructive))
@@ -277,7 +277,7 @@ private struct AuthenticationProfileEditorSheet: View {
                             Text(viewModel.editorTitle)
                                 .font(.system(size: 28, weight: .bold, design: .rounded))
                                 .foregroundStyle(theme.textPrimary)
-                            Text("Preencha os dados do perfil OCI com calma. Os detalhes técnicos ficam concentrados aqui para manter a entrada do app mais simples.")
+                            Text(L10n.string("auth.editor.description"))
                                 .font(.body)
                                 .foregroundStyle(theme.textSecondary)
                                 .frame(maxWidth: 520, alignment: .leading)
@@ -285,7 +285,7 @@ private struct AuthenticationProfileEditorSheet: View {
 
                         Spacer()
 
-                        Button("Fechar") {
+                        Button(L10n.string("common.close")) {
                             viewModel.dismissProfileEditor()
                             dismiss()
                         }
@@ -298,18 +298,18 @@ private struct AuthenticationProfileEditorSheet: View {
                         StatusBadge(title: connectionStatus, kind: .success)
                     }
 
-                    AppSectionCard(title: "Perfil", subtitle: "Identificação do perfil e método de autenticação.") {
+                    AppSectionCard(title: L10n.string("auth.section.profile.title"), subtitle: L10n.string("auth.section.profile.subtitle")) {
                         VStack(spacing: 16) {
                             AppTextField(
-                                "Nome do perfil",
-                                placeholder: "Ex.: Produção OCI",
+                                L10n.string("auth.field.profile_name"),
+                                placeholder: L10n.string("auth.field.profile_name.placeholder"),
                                 text: $viewModel.draft.profileName,
                                 error: viewModel.validationErrors[.profileName]
                             )
 
                             VStack(alignment: .leading, spacing: 8) {
-                                AppFieldLabel(title: "Método de autenticação", helper: "A arquitetura já está pronta para suportar outros métodos nas próximas iterações.")
-                                Picker("Método", selection: $viewModel.draft.method) {
+                                AppFieldLabel(title: L10n.string("auth.field.auth_method"), helper: L10n.string("auth.field.auth_method.helper"))
+                                Picker(L10n.string("auth.field.auth_method"), selection: $viewModel.draft.method) {
                                     Text(AuthenticationMethod.apiKey.displayName).tag(AuthenticationMethod.apiKey)
                                 }
                                 .pickerStyle(.segmented)
@@ -318,22 +318,22 @@ private struct AuthenticationProfileEditorSheet: View {
                         }
                     }
 
-                    AppSectionCard(title: "Credenciais OCI", subtitle: "Somente os campos necessários para a conexão via API Key.") {
+                    AppSectionCard(title: L10n.string("auth.section.credentials.title"), subtitle: L10n.string("auth.section.credentials.subtitle")) {
                         VStack(spacing: 16) {
                             AppTextField(
-                                "Tenancy OCID",
+                                L10n.string("auth.field.tenancy_ocid"),
                                 placeholder: "ocid1.tenancy.oc1...",
                                 text: $viewModel.draft.tenancyOCID,
                                 error: viewModel.validationErrors[.tenancyOCID]
                             )
                             AppTextField(
-                                "User OCID",
+                                L10n.string("auth.field.user_ocid"),
                                 placeholder: "ocid1.user.oc1...",
                                 text: $viewModel.draft.userOCID,
                                 error: viewModel.validationErrors[.userOCID]
                             )
                             AppTextField(
-                                "Fingerprint",
+                                L10n.string("auth.field.fingerprint"),
                                 placeholder: "11:22:33:44:...",
                                 text: $viewModel.draft.fingerprint,
                                 error: viewModel.validationErrors[.fingerprint]
@@ -342,17 +342,17 @@ private struct AuthenticationProfileEditorSheet: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack(alignment: .center, spacing: 10) {
                                     AppFieldLabel(
-                                        title: "Região",
+                                        title: L10n.string("auth.field.region"),
                                         helper: viewModel.hasLoadedRegions
-                                            ? "Escolha uma região subscribed do tenancy. O valor salvo continua sendo o region code."
-                                            : "O app tenta carregar automaticamente as regiões subscribed do tenancy."
+                                            ? L10n.string("auth.field.region.helper.loaded")
+                                            : L10n.string("auth.field.region.helper.loading")
                                     )
                                     Spacer()
                                     if viewModel.isLoadingRegions {
                                         ProgressView()
                                             .controlSize(.small)
                                     }
-                                    Button("Atualizar regiões") {
+                                    Button(L10n.string("auth.field.region.refresh")) {
                                         Task { await viewModel.loadSubscribedRegionsIfPossible() }
                                     }
                                     .buttonStyle(.borderless)
@@ -360,7 +360,7 @@ private struct AuthenticationProfileEditorSheet: View {
                                 }
 
                                 if viewModel.hasLoadedRegions && !viewModel.draft.isManualRegionEntry {
-                                    Picker("Região", selection: $viewModel.draft.region) {
+                                    Picker(L10n.string("auth.field.region"), selection: $viewModel.draft.region) {
                                         ForEach(viewModel.regions) { region in
                                             Text(region.displayName).tag(region.regionCode)
                                         }
@@ -378,30 +378,30 @@ private struct AuthenticationProfileEditorSheet: View {
                                             .stroke(theme.borderSubtle, lineWidth: 1)
                                     )
 
-                                    Button("Ou inserir manualmente") {
+                                    Button(L10n.string("auth.field.region.manual.action")) {
                                         viewModel.enableManualRegionEntry()
                                     }
                                     .buttonStyle(.link)
                                     .foregroundStyle(BrandColors.brandBluePrimary)
                                 } else {
                                     AppTextField(
-                                        "Região manual",
-                                        placeholder: "sa-saopaulo-1",
+                                        L10n.string("auth.field.region.manual"),
+                                        placeholder: L10n.string("auth.field.region.manual.placeholder"),
                                         text: $viewModel.draft.region,
                                         error: viewModel.validationErrors[.region],
-                                        helper: "Use este fallback se a lista automática não estiver disponível."
+                                        helper: L10n.string("auth.field.region.manual.helper")
                                     )
 
                                     HStack(spacing: 12) {
                                         if viewModel.hasLoadedRegions {
-                                            Button("Usar lista automática") {
+                                            Button(L10n.string("auth.field.region.automatic.action")) {
                                                 viewModel.useAutomaticRegionList()
                                             }
                                             .buttonStyle(.link)
                                             .foregroundStyle(BrandColors.brandBluePrimary)
                                         }
 
-                                        AppPickerField("Regiões comuns", helper: "Fallback rápido para regiões conhecidas.", selection: $viewModel.draft.region) {
+                                        AppPickerField(L10n.string("auth.field.region.common"), helper: L10n.string("auth.field.region.common.helper"), selection: $viewModel.draft.region) {
                                             ForEach(viewModel.commonRegions, id: \.self) { region in
                                                 Text(region).tag(region)
                                             }
@@ -418,40 +418,40 @@ private struct AuthenticationProfileEditorSheet: View {
                             }
 
                             AppTextField(
-                                "Namespace",
-                                placeholder: "Deixe em branco para detectar automaticamente",
+                                L10n.string("auth.field.namespace"),
+                                placeholder: L10n.string("auth.field.namespace.placeholder"),
                                 text: $viewModel.draft.namespace,
-                                helper: "Opcional"
+                                helper: L10n.string("auth.field.optional")
                             )
                             AppTextField(
-                                "Compartment OCID padrão",
+                                L10n.string("auth.field.default_compartment"),
                                 placeholder: "ocid1.compartment.oc1...",
                                 text: $viewModel.draft.defaultCompartmentOCID,
-                                helper: "Opcional. Se ficar vazio, o app usa o tenancy OCID."
+                                helper: L10n.string("auth.field.default_compartment.helper")
                             )
                         }
                     }
 
-                    AppSectionCard(title: "Chave privada", subtitle: "Selecione o arquivo PEM privado correspondente à API Key cadastrada no OCI.") {
+                    AppSectionCard(title: L10n.string("auth.section.private_key.title"), subtitle: L10n.string("auth.section.private_key.subtitle")) {
                         VStack(spacing: 16) {
                             AppFileField(
-                                title: "Arquivo PEM",
+                                title: L10n.string("auth.field.pem_file"),
                                 path: viewModel.draft.privateKeyPath,
-                                statusText: viewModel.draft.privateKeyPEM.isEmpty ? "Nenhuma chave carregada ainda." : "Chave privada carregada com sucesso na sessão atual.",
+                                statusText: viewModel.draft.privateKeyPEM.isEmpty ? L10n.string("auth.field.pem_file.status.empty") : L10n.string("auth.field.pem_file.status.loaded"),
                                 error: viewModel.validationErrors[.privateKey],
-                                actionTitle: "Selecionar arquivo..."
+                                actionTitle: L10n.string("auth.field.pem_file.action")
                             ) {
                                 viewModel.importPrivateKey()
                             }
 
                             AppSecureField(
-                                "Passphrase",
-                                placeholder: "Informe somente se a chave exigir",
+                                L10n.string("auth.field.passphrase"),
+                                placeholder: L10n.string("auth.field.passphrase.placeholder"),
                                 text: $viewModel.draft.passphrase,
-                                helper: "Opcional"
+                                helper: L10n.string("auth.field.optional")
                             )
 
-                            Toggle("Salvar credenciais com segurança no Keychain do macOS", isOn: $viewModel.draft.rememberMe)
+                            Toggle(L10n.string("auth.field.remember_me"), isOn: $viewModel.draft.rememberMe)
                                 .toggleStyle(.switch)
                                 .foregroundStyle(theme.textPrimary)
                         }
@@ -465,12 +465,12 @@ private struct AuthenticationProfileEditorSheet: View {
                                 ProgressView()
                                     .controlSize(.small)
                             } else {
-                                Text("Testar conexão")
+                                Text(L10n.string("auth.test_connection"))
                             }
                         }
                         .buttonStyle(AppButtonStyle(kind: .secondary))
 
-                        Button("Salvar perfil") {
+                        Button(L10n.string("auth.save_profile")) {
                             viewModel.saveProfile()
                             if !viewModel.isPresentingProfileEditor {
                                 dismiss()
@@ -478,7 +478,7 @@ private struct AuthenticationProfileEditorSheet: View {
                         }
                         .buttonStyle(AppButtonStyle(kind: .secondary))
 
-                        Button("Cancelar") {
+                        Button(L10n.string("common.cancel")) {
                             viewModel.dismissProfileEditor()
                             dismiss()
                         }
@@ -493,7 +493,7 @@ private struct AuthenticationProfileEditorSheet: View {
                                 ProgressView()
                                     .controlSize(.small)
                             } else {
-                                Text("Conectar")
+                                Text(L10n.string("auth.connect"))
                                     .frame(minWidth: 110)
                             }
                         }

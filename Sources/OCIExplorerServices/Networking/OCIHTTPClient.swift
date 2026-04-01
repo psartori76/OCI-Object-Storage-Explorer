@@ -53,7 +53,7 @@ public final class OCIHTTPClient: NSObject, OCIHTTPClientProtocol, @unchecked Se
         await logger.log(.debug, category: "HTTP", message: "\(request.httpMethod ?? "GET") \(request.url?.path ?? "")")
         let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw AppError.network("A resposta recebida não é HTTP.")
+            throw AppError.network(L10n.string("error.http.non_http_response"))
         }
         try validate(httpResponse: httpResponse, data: data)
         return (data, httpResponse)
@@ -99,8 +99,8 @@ public final class OCIHTTPClient: NSObject, OCIHTTPClientProtocol, @unchecked Se
 
     private func validate(httpResponse: HTTPURLResponse, data: Data) throws {
         guard (200 ..< 300).contains(httpResponse.statusCode) else {
-            let body = String(data: data, encoding: .utf8) ?? "Sem corpo"
-            throw AppError.network("OCI retornou HTTP \(httpResponse.statusCode): \(body)")
+            let body = String(data: data, encoding: .utf8) ?? L10n.string("error.http.empty_body")
+            throw AppError.network(L10n.string("error.http.status", httpResponse.statusCode, body))
         }
     }
 }
@@ -146,7 +146,7 @@ extension OCIHTTPClient: URLSessionTaskDelegate, URLSessionDataDelegate, URLSess
             }
             try fileManager.moveItem(at: location, to: state.destinationURL)
         } catch {
-            state.continuation.resume(throwing: AppError.storage("Não foi possível salvar o download em disco. \(error.localizedDescription)"))
+            state.continuation.resume(throwing: AppError.storage(L10n.string("error.http.download_save_failed", error.localizedDescription)))
             lock.lock()
             downloadStates.removeValue(forKey: downloadTask.taskIdentifier)
             lock.unlock()
@@ -166,7 +166,7 @@ extension OCIHTTPClient: URLSessionTaskDelegate, URLSessionDataDelegate, URLSess
         }
 
         guard let httpResponse = task.response as? HTTPURLResponse else {
-            let error = AppError.network("A resposta da transferência não é HTTP.")
+            let error = AppError.network(L10n.string("error.http.transfer_non_http"))
             uploadState?.continuation.resume(throwing: error)
             downloadState?.continuation.resume(throwing: error)
             return

@@ -26,8 +26,8 @@ enum PARDisplayScope: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .bucket: return "Bucket"
-        case .object: return "Objeto"
+        case .bucket: return L10n.string("par.scope.bucket")
+        case .object: return L10n.string("par.scope.object")
         }
     }
 }
@@ -87,19 +87,19 @@ final class PARManagementViewModel: ObservableObject {
     }
 
     var title: String {
-        "Links compartilháveis"
+        L10n.string("par.title")
     }
 
     var subtitle: String {
-        "Gerencie Pre-Authenticated Requests do bucket \(bucketName)."
+        L10n.string("par.subtitle", bucketName)
     }
 
     var emptyTitle: String {
-        "Nenhum link compartilhável criado ainda"
+        L10n.string("par.empty.title")
     }
 
     var emptyMessage: String {
-        "Crie um novo link para que ele apareça aqui com expiração, acesso e ações rápidas."
+        L10n.string("par.empty.message")
     }
 
     var availableAccessTypes: [PARAccessType] {
@@ -114,12 +114,12 @@ final class PARManagementViewModel: ObservableObject {
     var expirationDescription: String {
         let components = Calendar.current.dateComponents([.day, .hour], from: .now, to: draft.expiresAt)
         if let day = components.day, day > 0 {
-            return day == 1 ? "Expira em 1 dia" : "Expira em \(day) dias"
+            return day == 1 ? L10n.string("par.field.expiration.helper.one_day") : L10n.string("par.field.expiration.helper.days", day)
         }
         if let hour = components.hour, hour > 0 {
-            return hour == 1 ? "Expira em 1 hora" : "Expira em \(hour) horas"
+            return hour == 1 ? L10n.string("par.field.expiration.helper.one_hour") : L10n.string("par.field.expiration.helper.hours", hour)
         }
-        return "Expiração iminente"
+        return L10n.string("par.field.expiration.helper.imminent")
     }
 
     func openCreateModal() {
@@ -145,7 +145,7 @@ final class PARManagementViewModel: ObservableObject {
             mergeAndPersist(remote)
             inlineErrorMessage = nil
         } catch {
-            logger.log(.warning, category: "PAR", message: "Falha ao atualizar lista remota de PARs", metadata: ["bucket": bucketName, "error": AppError.from(error).localizedDescription])
+            logger.log(.warning, category: "PAR", message: L10n.string("par.log.refresh_remote"), metadata: ["bucket": bucketName, "error": AppError.from(error).localizedDescription])
             loadLocalState()
             if pars.isEmpty {
                 state = .empty
@@ -162,7 +162,7 @@ final class PARManagementViewModel: ObservableObject {
             let request = try buildCreateRequest()
             let created = try await service.createPreAuthenticatedRequest(bucketName: bucketName, request: request, using: auth)
             upsert(created)
-            toast = PARToast(message: "Link criado com sucesso", actionTitle: "Copiar link", par: created)
+            toast = PARToast(message: L10n.string("par.toast.created"), actionTitle: L10n.string("par.toast.copy_link"), par: created)
             isCreateModalPresented = false
             await refresh()
         } catch {
@@ -176,7 +176,7 @@ final class PARManagementViewModel: ObservableObject {
             pars.removeAll { $0.id == par.id }
             try? historyStore.remove(id: par.id)
             updateState()
-            toast = PARToast(message: "Link removido", actionTitle: nil, par: nil)
+            toast = PARToast(message: L10n.string("par.toast.removed"), actionTitle: nil, par: nil)
         } catch {
             inlineErrorMessage = AppError.from(error).localizedDescription
         }
@@ -185,7 +185,7 @@ final class PARManagementViewModel: ObservableObject {
     func copyURL(for par: PARSummary) {
         guard let url = par.fullPath else { return }
         NativeDialogs.copyToPasteboard(url)
-        toast = PARToast(message: "Link copiado", actionTitle: nil, par: nil)
+        toast = PARToast(message: L10n.string("par.toast.copied"), actionTitle: nil, par: nil)
     }
 
     func consumeToast() {
@@ -211,12 +211,12 @@ final class PARManagementViewModel: ObservableObject {
     private func buildCreateRequest() throws -> CreatePARRequestModel {
         let trimmedName = draft.name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else {
-            throw AppError.validation("Informe um nome para o link.")
+            throw AppError.validation(L10n.string("par.validation.name_required"))
         }
 
         let objectName = draft.objectName.trimmingCharacters(in: .whitespacesAndNewlines)
         if draft.scope == .object, objectName.isEmpty {
-            throw AppError.validation("Selecione ou informe um objeto para criar o link.")
+            throw AppError.validation(L10n.string("par.validation.object_required"))
         }
 
         let accessType = availableAccessTypes.contains(draft.accessType) ? draft.accessType : defaultAccessType
@@ -276,19 +276,19 @@ final class PARManagementViewModel: ObservableObject {
 extension PARSummary {
     var scopeTitle: String {
         if let objectName, !objectName.isEmpty {
-            return "Objeto"
+            return L10n.string("par.scope.object")
         }
-        return "Bucket"
+        return L10n.string("par.scope.bucket")
     }
 
     var accessTitle: String {
         switch accessType {
         case PARAccessType.objectRead.rawValue, PARAccessType.anyObjectRead.rawValue:
-            return "Leitura"
+            return L10n.string("par.access.read")
         case PARAccessType.objectWrite.rawValue, PARAccessType.anyObjectWrite.rawValue:
-            return "Escrita"
+            return L10n.string("par.access.write")
         default:
-            return "Leitura/Escrita"
+            return L10n.string("par.access.read_write")
         }
     }
 
@@ -298,7 +298,7 @@ extension PARSummary {
     }
 
     var statusTitle: String {
-        isExpired ? "Expirado" : "Ativo"
+        isExpired ? L10n.string("par.status.expired") : L10n.string("par.status.active")
     }
 
     var truncatedURL: String {

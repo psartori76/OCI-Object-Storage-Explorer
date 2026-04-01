@@ -23,7 +23,7 @@ public final class OCIObjectStorageService: OCIObjectStorageServiceProtocol, @un
             if let date = SharedFormatters.parseISO8601(value) {
                 return date
             }
-            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Data inválida: \(value)")
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: L10n.string("error.decoding.invalid_date", value))
         }
         self.encoder = JSONEncoder()
         self.encoder.dateEncodingStrategy = .iso8601
@@ -31,11 +31,11 @@ public final class OCIObjectStorageService: OCIObjectStorageServiceProtocol, @un
 
     public func testConnection(using auth: OCIAuthenticationConfig) async throws -> ConnectionTestResult {
         let namespace = try await resolveNamespace(using: auth)
-        await logger.log(.info, category: "Auth", message: "Conexão validada com sucesso.", metadata: ["namespace": namespace])
+        await logger.log(.info, category: "Auth", message: L10n.string("service.connection.validated"), metadata: ["namespace": namespace])
         return ConnectionTestResult(
             resolvedNamespace: namespace,
             region: auth.region,
-            message: "Conectado ao Object Storage com sucesso."
+            message: L10n.string("service.connection.success")
         )
     }
 
@@ -249,7 +249,7 @@ public final class OCIObjectStorageService: OCIObjectStorageServiceProtocol, @un
             await logger.log(
                 .warning,
                 category: "PAR",
-                message: "Falha ao atualizar lista remota de PARs. O app seguirá com a lista local disponível.",
+                message: L10n.string("service.par.remote_fallback"),
                 metadata: [
                     "bucket": bucketName,
                     "reason": AppError.from(error).localizedDescription
@@ -278,7 +278,7 @@ public final class OCIObjectStorageService: OCIObjectStorageServiceProtocol, @un
         if let namespace = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines), !namespace.isEmpty {
             return namespace.replacingOccurrences(of: "\"", with: "")
         }
-        throw AppError.authentication("Não foi possível detectar automaticamente o namespace do Object Storage.")
+        throw AppError.authentication(L10n.string("error.object_storage.namespace_detect_failed"))
     }
 
     private func getBucketSummary(named bucketName: String, namespace: String, auth: OCIAuthenticationConfig) async throws -> BucketSummary {
@@ -347,7 +347,7 @@ public final class OCIObjectStorageService: OCIObjectStorageServiceProtocol, @un
             }
         }
 
-        throw AppError.parsing("A resposta de listagem de PARs veio em um formato inesperado.")
+        throw AppError.parsing(L10n.string("error.object_storage.par_list_unexpected"))
     }
 
     private func parseHTTPDate(_ value: String) -> Date? {

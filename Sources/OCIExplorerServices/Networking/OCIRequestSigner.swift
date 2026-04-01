@@ -12,7 +12,7 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
 
     public func sign(_ request: URLRequest, bodyData: Data?, auth: OCIAuthenticationConfig) throws -> URLRequest {
         guard let url = request.url else {
-            throw AppError.configuration("A requisição não possui URL válida.")
+            throw AppError.configuration(L10n.string("request.invalid_url"))
         }
 
         var signedRequest = request
@@ -42,7 +42,7 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
                 return "(request-target): \(method.lowercased()) \(path)\(querySuffix)"
             default:
                 guard let value = signedRequest.value(forHTTPHeaderField: header) else {
-                    throw AppError.configuration("Cabeçalho obrigatório ausente para assinatura: \(header)")
+                    throw AppError.configuration(L10n.string("request.signing.missing_header", header))
                 }
                 return "\(header): \(value)"
             }
@@ -70,8 +70,8 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
         let key = try importPrivateKey(from: pemBlock)
         var error: Unmanaged<CFError>?
         guard let signature = SecKeyCreateSignature(key, .rsaSignatureMessagePKCS1v15SHA256, message as CFData, &error) as Data? else {
-            let description = (error?.takeRetainedValue() as Error?)?.localizedDescription ?? "Falha desconhecida ao assinar a requisição."
-            throw AppError.authentication("Não foi possível assinar a requisição para o OCI. \(description)")
+            let description = (error?.takeRetainedValue() as Error?)?.localizedDescription ?? L10n.string("error.signing.unknown")
+            throw AppError.authentication(L10n.string("request.signing.could_not_sign", description))
         }
         return signature.base64EncodedString()
     }
@@ -85,7 +85,7 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
             attemptedPayloads.append(wrapPKCS1RSAPrivateKeyAsPKCS8(pemBlock.derData))
         }
 
-        var lastDescription = "Falha desconhecida ao carregar a chave."
+        var lastDescription = L10n.string("request.signing.load_key_unknown")
         for payload in attemptedPayloads {
             let attributes: [String: Any] = [
                 kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
@@ -99,7 +99,7 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
             lastDescription = (error?.takeRetainedValue() as Error?)?.localizedDescription ?? lastDescription
         }
 
-        throw AppError.authentication("Não foi possível importar a chave privada PEM. Verifique se ela é uma chave RSA válida do OCI em formato PKCS#8 ou PKCS#1. Detalhe: \(lastDescription)")
+        throw AppError.authentication(L10n.string("request.signing.import_private_key", lastDescription))
     }
 
     private func decodePEM(_ pem: String, passphrase: String?) throws -> PEMBlock {
@@ -110,7 +110,7 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
             .filter { !$0.isEmpty }
 
         guard let beginLine = lines.first(where: { $0.hasPrefix("-----BEGIN ") && $0.hasSuffix("-----") }) else {
-            throw AppError.parsing("A chave privada PEM não contém um cabeçalho BEGIN válido.")
+            throw AppError.parsing(L10n.string("request.signing.invalid_begin"))
         }
 
         let header = beginLine
@@ -121,13 +121,13 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
         let isEncryptedPEM = header == "ENCRYPTED PRIVATE KEY" || lines.contains(where: { $0.hasPrefix("Proc-Type:") || $0.hasPrefix("DEK-Info:") })
         if isEncryptedPEM {
             if passphrase?.isEmpty == false {
-                throw AppError.notImplemented("Esta chave PEM está criptografada. O app ainda não importa PEM criptografado automaticamente. Converta para uma chave PEM RSA não criptografada para usar no OCI Explorer.")
+                throw AppError.notImplemented(L10n.string("request.signing.encrypted_not_supported"))
             }
-            throw AppError.authentication("A chave privada informada está criptografada. Informe uma chave PEM RSA não criptografada ou converta a chave antes de conectar.")
+            throw AppError.authentication(L10n.string("request.signing.encrypted_key"))
         }
 
         if header == "OPENSSH PRIVATE KEY" {
-            throw AppError.authentication("O formato OPENSSH PRIVATE KEY não é aceito pelo OCI Explorer. Exporte a chave em PEM RSA para uso com a API Key do OCI.")
+            throw AppError.authentication(L10n.string("request.signing.openssh_not_supported"))
         }
 
         let base64Payload = lines
@@ -137,7 +137,7 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
             .replacingOccurrences(of: " ", with: "")
 
         guard let derData = Data(base64Encoded: base64Payload, options: [.ignoreUnknownCharacters]), !derData.isEmpty else {
-            throw AppError.parsing("A chave privada PEM não pôde ser convertida para DER. Verifique se o conteúdo do arquivo PEM está íntegro e em formato RSA/PKCS válido.")
+            throw AppError.parsing(L10n.string("request.signing.invalid_der"))
         }
 
         let kind: PEMBlockKind
@@ -147,7 +147,7 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
         case "RSA PRIVATE KEY":
             kind = .rsaPrivateKey
         default:
-            throw AppError.authentication("Formato de chave não suportado: \(header). Use uma chave PEM RSA do OCI.")
+            throw AppError.authentication(L10n.string("request.signing.unsupported_format", header))
         }
 
         return PEMBlock(kind: kind, derData: derData)
@@ -192,7 +192,7 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
         let privateKeyOctetString = try readASN1Element(expectedTag: 0x04, from: topSequence, cursor: &innerCursor)
 
         guard isRSAAlgorithmIdentifier(algorithmIdentifier) else {
-            throw AppError.authentication("A chave PKCS#8 informada não é uma chave RSA.")
+            throw AppError.authentication(L10n.string("request.signing.pkcs8_not_rsa"))
         }
 
         return privateKeyOctetString
@@ -205,18 +205,18 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
 
     private func readASN1Element(expectedTag: UInt8, from data: Data, cursor: inout Int) throws -> Data {
         guard cursor < data.count else {
-            throw AppError.parsing("DER inválido: fim inesperado dos dados.")
+            throw AppError.parsing(L10n.string("request.signing.der.unexpected_end"))
         }
         let tag = data[cursor]
         guard tag == expectedTag else {
-            throw AppError.parsing("DER inválido: tag ASN.1 inesperada.")
+            throw AppError.parsing(L10n.string("request.signing.der.unexpected_tag"))
         }
         cursor += 1
 
         let length = try readASN1Length(from: data, cursor: &cursor)
         let end = cursor + length
         guard end <= data.count else {
-            throw AppError.parsing("DER inválido: comprimento ASN.1 fora dos limites.")
+            throw AppError.parsing(L10n.string("request.signing.der.length_out_of_bounds"))
         }
 
         let elementData = data[cursor ..< end]
@@ -226,7 +226,7 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
 
     private func readASN1Length(from data: Data, cursor: inout Int) throws -> Int {
         guard cursor < data.count else {
-            throw AppError.parsing("DER inválido: comprimento ASN.1 ausente.")
+            throw AppError.parsing(L10n.string("request.signing.der.length_missing"))
         }
 
         let firstByte = data[cursor]
@@ -238,7 +238,7 @@ public struct OCIRequestSigner: OCIRequestSignerProtocol {
 
         let byteCount = Int(firstByte & 0x7F)
         guard byteCount > 0, cursor + byteCount <= data.count else {
-            throw AppError.parsing("DER inválido: comprimento ASN.1 malformado.")
+            throw AppError.parsing(L10n.string("request.signing.der.length_malformed"))
         }
 
         var length = 0

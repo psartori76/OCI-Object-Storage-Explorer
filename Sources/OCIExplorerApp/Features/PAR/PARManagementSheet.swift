@@ -19,19 +19,19 @@ struct PARManagementSheet: View {
                         .foregroundStyle(theme.textSecondary)
                 }
                 Spacer()
-                Button("Fechar") {
+                Button(L10n.string("common.close")) {
                     dismiss()
                 }
                 .buttonStyle(AppButtonStyle(kind: .secondary))
             }
 
             HStack {
-                Button("Criar novo link") {
+                Button(L10n.string("par.create_new")) {
                     viewModel.openCreateModal()
                 }
                 .buttonStyle(AppButtonStyle(kind: .primary))
 
-                Button("Atualizar") {
+                Button(L10n.string("common.refresh")) {
                     Task { await viewModel.refresh() }
                 }
                 .buttonStyle(AppButtonStyle(kind: .secondary))
@@ -90,7 +90,7 @@ struct PARListView: View {
     var body: some View {
         switch viewModel.state {
         case .idle, .loading:
-            PARLoadingView(title: "Carregando links compartilháveis…")
+            PARLoadingView(title: L10n.string("par.loading"))
         case .empty:
             EmptyStateView(
                 systemImage: "link",
@@ -100,7 +100,7 @@ struct PARListView: View {
         case let .error(message):
             EmptyStateView(
                 systemImage: "exclamationmark.triangle",
-                title: "Não foi possível carregar os links",
+                title: L10n.string("par.error.load"),
                 message: message
             )
         case .loaded:
@@ -112,7 +112,7 @@ struct PARListView: View {
         let theme = AppTheme.current(for: colorScheme)
 
         return Table(viewModel.pars) {
-            TableColumn("Nome") { par in
+            TableColumn(L10n.string("common.name")) { par in
                 VStack(alignment: .leading, spacing: 4) {
                     Text(par.name)
                         .font(.body.weight(.medium))
@@ -126,37 +126,37 @@ struct PARListView: View {
             }
             .width(min: 260, ideal: 320)
 
-            TableColumn("Tipo") { par in
+            TableColumn(L10n.string("common.type")) { par in
                 Text(par.scopeTitle)
                     .foregroundStyle(theme.textSecondary)
             }
             .width(min: 80, ideal: 100)
 
-            TableColumn("Acesso") { par in
+            TableColumn(L10n.string("common.access")) { par in
                 Text(par.accessTitle)
                     .foregroundStyle(theme.textSecondary)
             }
             .width(min: 120, ideal: 150)
 
-            TableColumn("Expiração") { par in
+            TableColumn(L10n.string("common.expiration")) { par in
                 Text(par.timeExpires.friendlyDateText)
                     .foregroundStyle(theme.textSecondary)
             }
             .width(min: 160, ideal: 190)
 
-            TableColumn("Status") { par in
+            TableColumn(L10n.string("common.status")) { par in
                 StatusBadge(title: par.statusTitle, kind: par.isExpired ? .warning : .success)
             }
             .width(min: 90, ideal: 110)
 
-            TableColumn("Ações") { par in
+            TableColumn(L10n.string("common.actions")) { par in
                 HStack(spacing: 8) {
-                    Button("Copiar") {
+                    Button(L10n.string("common.copy")) {
                         viewModel.copyURL(for: par)
                     }
                     .buttonStyle(.borderless)
 
-                    Button("Excluir", role: .destructive) {
+                    Button(L10n.string("common.delete"), role: .destructive) {
                         Task { await viewModel.deletePAR(par) }
                     }
                     .buttonStyle(.borderless)
@@ -206,10 +206,10 @@ struct CreatePARModalView: View {
         VStack(alignment: .leading, spacing: 18) {
             HStack {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Criar novo link")
+                    Text(L10n.string("par.modal.title"))
                         .font(.title2.weight(.semibold))
                         .foregroundStyle(theme.textPrimary)
-                    Text("Configure o escopo, o tipo de acesso e a expiração do novo Pre-Authenticated Request.")
+                    Text(L10n.string("par.modal.subtitle"))
                         .foregroundStyle(theme.textSecondary)
                 }
                 Spacer()
@@ -219,9 +219,9 @@ struct CreatePARModalView: View {
                 StatusBadge(title: inlineErrorMessage, kind: .error)
             }
 
-            AppSectionCard(title: "Escopo") {
+            AppSectionCard(title: L10n.string("par.section.scope")) {
                 VStack(alignment: .leading, spacing: 16) {
-                    Picker("Escopo", selection: $viewModel.draft.scope) {
+                    Picker(L10n.string("common.scope"), selection: $viewModel.draft.scope) {
                         ForEach(PARDisplayScope.allCases) { scope in
                             Text(scope.title).tag(scope)
                         }
@@ -230,33 +230,33 @@ struct CreatePARModalView: View {
 
                     if viewModel.draft.scope == .object {
                         AppTextField(
-                            "Objeto",
-                            placeholder: "nome/do/objeto.ext",
+                            L10n.string("par.field.object"),
+                            placeholder: L10n.string("par.field.object.placeholder"),
                             text: $viewModel.draft.objectName
                         )
                     }
                 }
             }
 
-            AppSectionCard(title: "Configuração") {
+            AppSectionCard(title: L10n.string("par.section.configuration")) {
                 VStack(spacing: 16) {
                     AppTextField(
-                        "Nome",
-                        placeholder: "Ex.: Download temporário",
+                        L10n.string("common.name"),
+                        placeholder: L10n.string("par.field.name.placeholder"),
                         text: $viewModel.draft.name
                     )
 
                     VStack(alignment: .leading, spacing: 8) {
-                        AppFieldLabel(title: "Tipo de acesso", helper: nil)
-                        Picker("Tipo de acesso", selection: $viewModel.draft.accessType) {
+                        AppFieldLabel(title: L10n.string("par.field.access_type"), helper: nil)
+                        Picker(L10n.string("par.field.access_type"), selection: $viewModel.draft.accessType) {
                             accessTypeOptions
                         }
                         .pickerStyle(.segmented)
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        AppFieldLabel(title: "Expiração", helper: viewModel.expirationDescription)
-                        DatePicker("Expiração", selection: $viewModel.draft.expiresAt)
+                        AppFieldLabel(title: L10n.string("common.expiration"), helper: viewModel.expirationDescription)
+                        DatePicker(L10n.string("common.expiration"), selection: $viewModel.draft.expiresAt)
                             .labelsHidden()
                     }
                 }
@@ -264,7 +264,7 @@ struct CreatePARModalView: View {
 
             HStack {
                 Spacer()
-                Button("Cancelar") {
+                Button(L10n.string("common.cancel")) {
                     viewModel.dismissCreateModal()
                     dismiss()
                 }
@@ -281,7 +281,7 @@ struct CreatePARModalView: View {
                     if viewModel.isCreating {
                         ProgressView()
                     } else {
-                        Text("Criar link")
+                        Text(L10n.string("par.create_new"))
                             .frame(minWidth: 110)
                     }
                 }
@@ -295,13 +295,13 @@ struct CreatePARModalView: View {
     @ViewBuilder
     private var accessTypeOptions: some View {
         if viewModel.draft.scope == .bucket {
-            Text("Leitura").tag(PARAccessType.anyObjectRead)
-            Text("Escrita").tag(PARAccessType.anyObjectWrite)
-            Text("Leitura/Escrita").tag(PARAccessType.anyObjectReadWrite)
+            Text(L10n.string("par.access.read")).tag(PARAccessType.anyObjectRead)
+            Text(L10n.string("par.access.write")).tag(PARAccessType.anyObjectWrite)
+            Text(L10n.string("par.access.read_write")).tag(PARAccessType.anyObjectReadWrite)
         } else {
-            Text("Leitura").tag(PARAccessType.objectRead)
-            Text("Escrita").tag(PARAccessType.objectWrite)
-            Text("Leitura/Escrita").tag(PARAccessType.objectReadWrite)
+            Text(L10n.string("par.access.read")).tag(PARAccessType.objectRead)
+            Text(L10n.string("par.access.write")).tag(PARAccessType.objectWrite)
+            Text(L10n.string("par.access.read_write")).tag(PARAccessType.objectReadWrite)
         }
     }
 }

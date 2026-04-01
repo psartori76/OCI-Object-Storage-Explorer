@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>count.available_buckets</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@buckets@</string>
+        <key>buckets</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>d</string>
+            <key>one</key>
+            <string>%d disponible</string>
+            <key>other</key>
+            <string>%d disponibles</string>
+        </dict>
+    </dict>
+    <key>count.object_versions</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@versions@</string>
+        <key>versions</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>d</string>
+            <key>one</key>
+            <string>%d versión</string>
+            <key>other</key>
+            <string>%d versiones</string>
+        </dict>
+    </dict>
+    <key>count.selected_items</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@items@</string>
+        <key>items</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>d</string>
+            <key>one</key>
+            <string>%d elemento seleccionado</string>
+            <key>other</key>
+            <string>%d elementos seleccionados</string>
+        </dict>
+    </dict>
+    <key>count.objects_deleted_success</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@objects@</string>
+        <key>objects</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>d</string>
+            <key>one</key>
+            <string>%d objeto eliminado correctamente.</string>
+            <key>other</key>
+            <string>%d objetos eliminados correctamente.</string>
+        </dict>
+    </dict>
+    <key>count.uploads_started</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@uploads@</string>
+        <key>uploads</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>d</string>
+            <key>one</key>
+            <string>%d carga iniciada.</string>
+            <key>other</key>
+            <string>%d cargas iniciadas.</string>
+        </dict>
+    </dict>
+    <key>count.downloads_added_queue</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@downloads@</string>
+        <key>downloads</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>d</string>
+            <key>one</key>
+            <string>%d descarga añadida a la cola.</string>
+            <key>other</key>
+            <string>%d descargas añadidas a la cola.</string>
+        </dict>
+    </dict>
+    <key>count.download_action</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@downloads@</string>
+        <key>downloads</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>d</string>
+            <key>one</key>
+            <string>Descarga</string>
+            <key>other</key>
+            <string>Descarga de %d elementos</string>
+        </dict>
+    </dict>
+</dict>
+</plist>

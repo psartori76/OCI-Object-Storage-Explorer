@@ -4,16 +4,22 @@ import OCIExplorerCore
 struct DiagnosticsView: View {
     @ObservedObject var logger: AppLogger
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         let theme = AppTheme.current(for: colorScheme)
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Diagnóstico")
+                Text(L10n.string("diagnostics.title"))
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(theme.textPrimary)
                 Spacer()
-                Button("Limpar") {
+                Button(L10n.string("common.close")) {
+                    dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
+                .buttonStyle(AppButtonStyle(kind: .secondary))
+                Button(L10n.string("diagnostics.clear")) {
                     logger.clear()
                 }
                 .buttonStyle(AppButtonStyle(kind: .secondary))
@@ -22,7 +28,7 @@ struct DiagnosticsView: View {
             List(logger.entries) { entry in
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        StatusBadge(title: entry.level.rawValue.uppercased(), kind: kind(for: entry.level))
+                        StatusBadge(title: localizedLevel(entry.level), kind: kind(for: entry.level))
                         Text(entry.category)
                             .font(.headline)
                             .foregroundStyle(theme.textPrimary)
@@ -59,6 +65,19 @@ struct DiagnosticsView: View {
             return .warning
         case .error:
             return .error
+        }
+    }
+
+    private func localizedLevel(_ level: LogLevel) -> String {
+        switch level {
+        case .debug:
+            return L10n.string("diagnostics.level.debug")
+        case .info:
+            return L10n.string("diagnostics.level.info")
+        case .warning:
+            return L10n.string("diagnostics.level.warning")
+        case .error:
+            return L10n.string("diagnostics.level.error")
         }
     }
 }

@@ -12,15 +12,15 @@ public enum AuthenticationMethod: String, Codable, CaseIterable, Identifiable, S
     public var displayName: String {
         switch self {
         case .apiKey:
-            return "API Key"
+            return L10n.string("auth.method.api_key")
         case .sessionToken:
-            return "Session Token"
+            return L10n.string("auth.method.session_token")
         case .instancePrincipal:
-            return "Instance Principal"
+            return L10n.string("auth.method.instance_principal")
         case .resourcePrincipal:
-            return "Resource Principal"
+            return L10n.string("auth.method.resource_principal")
         case .ociCLIConfig:
-            return "OCI CLI Config"
+            return L10n.string("auth.method.oci_cli_config")
         }
     }
 }

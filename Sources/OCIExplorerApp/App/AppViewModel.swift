@@ -40,7 +40,7 @@ final class AppViewModel: ObservableObject {
             let appError = AppError.from(error)
             authenticationViewModel.connectionStatus = nil
             authenticationViewModel.errorMessage = appError.localizedDescription
-            container.logger.log(.error, category: "App", message: "Falha ao iniciar sessão", metadata: ["error": appError.localizedDescription])
+            container.logger.log(.error, category: "App", message: L10n.string("app.log.session_start_failed"), metadata: ["error": appError.localizedDescription])
         }
     }
 

@@ -1,39 +1,38 @@
 # OCI Object Storage Explorer for macOS
 
-Aplicação desktop nativa para macOS, escrita em Swift + SwiftUI, para autenticar no Oracle Cloud Infrastructure e navegar pelo OCI Object Storage com uma experiência próxima a um file explorer moderno.
+Native macOS desktop app built with Swift and SwiftUI to authenticate with Oracle Cloud Infrastructure and browse OCI Object Storage with a modern file explorer-style experience.
 
-## Visão geral
+## Highlights
 
-O projeto prioriza:
+- Native macOS UI built with `NavigationSplitView`, toolbar, sheets, inspector, and light/dark mode support
+- Layered architecture with clear separation between UI, view models, core models, services, and utilities
+- Real OCI Object Storage integration through signed REST requests
+- Secure secret storage in the macOS Keychain
+- Full multilingual UI foundation with `pt-BR`, English, and Spanish localization
+- Architecture ready for future authentication methods and product expansion
 
-- UX nativa de macOS com `NavigationSplitView`, toolbar, inspector e dark/light mode.
-- Arquitetura em camadas, com separação clara entre UI, ViewModels, serviços, autenticação, modelos e utilitários.
-- Integração real com OCI Object Storage via REST API assinada.
-- Armazenamento seguro de segredos no Keychain do macOS.
-- Base pronta para evolução futura em múltiplos métodos de autenticação e novos fluxos operacionais.
+## Architecture
 
-## Arquitetura proposta
-
-### Camadas
+### Modules
 
 - `OCIExplorerApp`
-  - Camada de apresentação em SwiftUI.
-  - Views, view models, shell da aplicação e utilitários de interação nativa.
+  - SwiftUI presentation layer
+  - Views, view models, app shell, and native interaction utilities
 - `OCIExplorerCore`
-  - Modelos tipados, erros, formatação, validação e logging.
+  - Typed models, shared errors, formatting, localization, validation, and logging
 - `OCIExplorerServices`
-  - Integração com OCI, assinatura de requests, HTTP client, persistência de perfis, Keychain e coordenação de transferências.
+  - OCI integration, request signing, HTTP client, profile persistence, Keychain handling, and transfer orchestration
 
-### Padrão
+### Stack
 
 - UI: SwiftUI
-- Arquitetura: MVVM
-- Concorrência: `async/await`
-- Injeção de dependência: container simples (`AppContainer`)
-- Persistência: JSON para perfis + Keychain para segredos
-- Integração OCI: REST API com assinatura RSA SHA-256
+- Architecture: MVVM
+- Concurrency: `async/await`
+- Dependency injection: lightweight container in `AppContainer`
+- Persistence: JSON for profiles and Keychain for secrets
+- OCI integration: signed REST API with RSA SHA-256
 
-## Estrutura de pastas
+## Project Structure
 
 ```text
 Sources/
@@ -51,6 +50,7 @@ Sources/
     Errors/
     Logging/
     Models/
+    Resources/
     Utilities/
   OCIExplorerServices/
     Authentication/
@@ -63,259 +63,202 @@ Tests/
   OCIExplorerServicesTests/
 ```
 
-## Principais decisões técnicas
+## Key Technical Decisions
 
-### 1. Integração OCI via REST assinada
+### 1. Signed OCI REST integration
 
-Não há, na prática, um SDK Swift maduro e amplamente adotado cobrindo de forma confortável todo o fluxo necessário para um explorer macOS moderno. Por isso, a aplicação usa uma camada REST própria e organizada:
+The app uses a dedicated REST layer instead of depending on a heavy external SDK:
 
 - `OCIRequestSigner`
 - `OCIHTTPClient`
 - `OCIObjectStorageService`
 
-Vantagens:
+Benefits:
 
-- Controle fino sobre autenticação e headers assinados.
-- Menos dependências externas.
-- Maior previsibilidade para evolução de features específicas.
+- Fine-grained control over authentication and signed headers
+- Fewer external dependencies
+- Better predictability for OCI-specific product evolution
 
-### 2. Perfis seguros
+### 2. Secure profile handling
 
-Perfis salvos armazenam apenas metadados não sensíveis:
+Saved profiles only persist non-sensitive metadata:
 
-- nome
+- profile name
 - tenancy OCID
 - user OCID
 - fingerprint
 - region
 - namespace
-- compartment padrão
-- hint do caminho da chave
+- default compartment
+- private key path hint
 
-Segredos ficam no Keychain:
+Sensitive values stay in the macOS Keychain:
 
-- PEM da chave privada
+- private PEM key
 - passphrase
 
-### 3. Navegação por pastas virtuais
+### 3. Virtual folder navigation
 
-OCI Object Storage é flat. A experiência de diretórios é construída com base em:
+OCI Object Storage is flat. The app creates a folder-like UX based on:
 
 - `prefix`
 - `delimiter=/`
 
-Isso permite navegação com breadcrumb e visualização amigável de pseudo-pastas.
+This enables breadcrumbs, virtual folders, and a more familiar browsing experience.
 
-### 4. Transfer queue separada
+### 4. Central transfer queue
 
-Uploads e downloads são enviados para uma fila central (`TransferCoordinator`) com:
+Uploads and downloads run through `TransferCoordinator` with:
 
-- progresso por item
-- cancelamento
+- per-item progress
+- cancellation
 - retry
-- estados de fila
+- queued/running/completed/failed states
 
-## Funcionalidades implementadas
+### 5. Native localization architecture
 
-### Autenticação
+The app now uses Apple-native localization resources with a centralized helper:
 
-- Tela de autenticação com perfil salvo e edição
-- API Key como método principal
-- Campos:
-  - profile name
-  - tenancy OCID
-  - user OCID
-  - fingerprint
-  - region
-  - namespace opcional
-  - compartment padrão
-  - caminho/importação da chave PEM
-  - passphrase
-- Teste de conexão
-- Detecção automática de namespace
-- Salvamento seguro no Keychain
-- Duplicação e remoção de perfis
+- Base localization: `pt-BR`
+- Additional locales: `en`, `es`
+- Shared strings in `Localizable.strings`
+- Pluralization in `Localizable.stringsdict`
+- Locale-aware formatting for dates, times, and byte counts
+
+## Features
+
+### Authentication
+
+- Saved profiles with create, edit, duplicate, and remove flows
+- API Key as the primary authentication method
+- Namespace auto-detection
+- Connection testing
+- Secure Keychain persistence
+- Region loading from tenancy subscriptions
 
 ### Object Storage Explorer
 
-- Lista de buckets na sidebar
-- Criação e exclusão de bucket
-- Carregamento de detalhes do bucket
-- Navegação por prefixos
-- Breadcrumb
-- Busca local incremental
-- Alternância entre modos de visualização “lista” e “árvore”
-- Inspector com detalhes do bucket e do objeto selecionado
+- Bucket list in the sidebar
+- Bucket create and delete
+- Bucket details and inspector
+- Prefix navigation with breadcrumb
+- Local incremental search
+- Object and folder browsing
+- Context actions for common operations
 
-### Objetos
+### Objects
 
-- Listagem de objetos
-- Exclusão de objetos
-- Leitura de metadados do objeto
-- Copiar nome do objeto
+- Object listing
+- Metadata loading
+- Object deletion
+- Copy object name and full path
+- Object versions viewer
 
-### Transferências
+### Transfers
 
-- Upload de múltiplos arquivos via diálogo nativo
-- Download de múltiplos objetos para pasta local
-- Resolução de conflito de nome no download
-- Progresso por item
-- Cancelamento
-- Retry
-- Fila visual de transferências
+- Multi-file upload via native file picker
+- Multi-object download to a local folder
+- Conflict resolution for downloads
+- Progress tracking
+- Cancellation and retry
+- Dedicated transfer queue view
 
-### PAR
+### PAR Management
 
-- Criação de Pre-Authenticated Requests
-- Listagem de PARs do bucket atual
-- Remoção de PAR
-- Cópia da URL gerada
+- Create Pre-Authenticated Requests
+- List PARs for the current bucket
+- Remove PARs
+- Copy generated URLs
 
-### Diagnóstico
+### Diagnostics
 
-- Logging básico em memória
-- Tela simples de diagnósticos
-- Redação de informações sensíveis nos logs
+- In-memory logging
+- Diagnostics screen
+- Sensitive-data redaction in logs
 
-## Pré-requisitos
+## Localization
 
-- macOS 13 ou superior
-- Xcode com suporte a Swift 6.3
+The app currently ships with:
+
+- Portuguese (Brazil)
+- English
+- Spanish
+
+The UI follows the macOS system language automatically. Product-facing GitHub documentation and release notes are now maintained in English by default.
+
+## Requirements
+
+- macOS 13 or later
+- Xcode with Swift 6.3 support
 - Swift 6.3
-- Permissões e política OCI adequadas para Object Storage
+- OCI permissions and policies appropriate for Object Storage access
 
-## Como abrir no Xcode
+## Open in Xcode
 
-Como o projeto foi organizado como Swift Package executável com SwiftUI:
+Because the project is organized as an executable Swift Package with SwiftUI:
 
-1. Execute `./scripts/xcode_doctor.sh` para validar o ambiente.
-2. Se o terminal ainda estiver apontando para `CommandLineTools`, rode:
-   `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
-3. Abra o package com `./scripts/open_in_xcode.sh`
-4. Aguarde a indexação do package.
-5. No Xcode, selecione o produto executável `OCIObjectStorageExplorer`.
-6. Rode com `Run`.
+1. Run `./scripts/xcode_doctor.sh` to validate your environment.
+2. If your terminal still points to Command Line Tools, run `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`.
+3. Open the package with `./scripts/open_in_xcode.sh`.
+4. Wait for indexing to finish.
+5. In Xcode, select the executable product `OCIObjectStorageExplorer`.
+6. Run the app.
 
-### Observação importante
+### Important note
 
-Se o `xcodebuild` ou `xed` falharem com mensagem parecida com:
+If `xcodebuild` or `xed` fails with a message similar to:
 
 ```text
 xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance
 ```
 
-isso não é erro do projeto. Significa apenas que o macOS ainda está usando Command Line Tools em vez do `Xcode.app` como developer directory ativo.
+that indicates your system is still using Command Line Tools instead of `Xcode.app` as the active developer directory.
 
-## Como buildar
+## Build
 
-### Via Xcode
+### From Xcode
 
-Use o esquema do app e execute `Build`.
+Build the app using the executable scheme.
 
-### Via terminal
+### From the terminal
 
 ```bash
 swift build
 ```
 
-Observação: se o ambiente local estiver apontando para Command Line Tools com toolchain/SDK incompatíveis, pode ser necessário corrigir a seleção do Xcode/developer directory antes do build.
+If your local environment is pointing to an incompatible developer directory or SDK, switch the active Xcode path first.
 
-## Como executar
+## Run
 
 ```bash
 swift run OCIObjectStorageExplorer
 ```
 
-Em ambiente Xcode, basta rodar o target do app.
+## Package the `.app`
 
-## Como gerar o `.app`
-
-Depois do build release, gere o bundle final com:
+Generate a release build and package the macOS app bundle with:
 
 ```bash
 swift build -c release
 ./scripts/package_app.sh
 ```
 
-Saída esperada:
+Expected output:
 
 ```text
 dist/OCI Object Storage Explorer.app
 ```
 
-O usuário final pode arrastar esse `.app` para `Applications`.
+You can drag the generated `.app` into `Applications`.
 
-## Configuração de autenticação no OCI
+## OCI Authentication Setup
 
-### Passos gerais
-
-1. Gere ou use uma chave API associada ao usuário OCI.
-2. Cadastre a chave pública no usuário OCI.
-3. Copie para o app:
+1. Generate or reuse an OCI API key associated with your OCI user.
+2. Upload the public key to the OCI user.
+3. Provide the app with:
    - Tenancy OCID
    - User OCID
    - Fingerprint
    - Region
-   - Namespace, se quiser informar manualmente
-4. Importe o arquivo PEM privado no app.
-5. Informe o compartment padrão para listagem/criação de buckets.
-6. Clique em `Testar conexão`.
-7. Clique em `Conectar`.
-
-### Sobre o compartment padrão
-
-O fluxo principal do explorer usa um compartment padrão para listagem/criação de buckets. Se ele não for preenchido, o app usa o `Tenancy OCID` como fallback.
-
-## Exemplo de fluxo de uso
-
-1. Criar ou selecionar um perfil salvo.
-2. Importar a chave PEM privada.
-3. Testar a conexão.
-4. Conectar.
-5. Escolher um bucket na sidebar.
-6. Navegar pelos prefixos usando breadcrumb.
-7. Fazer upload para a pasta virtual atual.
-8. Selecionar objetos e baixar para uma pasta local.
-9. Criar um PAR para bucket ou objeto selecionado.
-10. Acompanhar fila e diagnósticos quando necessário.
-
-## Testes incluídos
-
-- Persistência de perfis em disco
-- Fluxo de conexão no `AuthenticationViewModel`
-- Filtro de objetos no `ExplorerViewModel`
-
-Os testes usam mocks para a camada de serviço e Keychain em memória.
-
-## Limitações conhecidas
-
-- A listagem de buckets usa um compartment padrão, em vez de varrer toda a árvore de compartments/tenancy.
-- Suporte completo a PEM criptografado com passphrase ainda não está finalizado no importador RSA atual.
-- Multipart upload ainda não foi implementado; uploads grandes usam `PUT` direto.
-- Rename/copy de objetos ainda não foram finalizados.
-- Preview de arquivos ainda é um placeholder funcional para evolução futura.
-- Refresh automático e múltiplas janelas ainda não foram adicionados.
-
-## Próximos passos sugeridos
-
-- Multipart upload para arquivos grandes
-- Suporte completo a chaves PEM criptografadas
-- Importação automática de `~/.oci/config`
-- Renomear objeto via `renameObject` ou `copy + delete`
-- Preview de texto, JSON e imagens pequenas
-- Navegação expandida por compartments via Identity API
-- Busca remota incremental com paginação mais sofisticada
-- Drag and drop direto no browser de objetos
-- Histórico persistente de operações
-
-## Segurança
-
-- Segredos não são persistidos em texto puro.
-- Logs são sanitizados.
-- Timeouts HTTP estão configurados.
-- Erros são apresentados de forma amigável sem expor material sensível.
-
-## Observações de implementação
-
-- O projeto foi estruturado para ser evoluído em módulos.
-- Onde um fluxo mais profundo não foi finalizado, a base foi deixada preparada com tipos, protocolos e separação de responsabilidades para continuação profissional.
+   - Namespace, if you want to set it manually
+4. Import the private PEM file in the app.

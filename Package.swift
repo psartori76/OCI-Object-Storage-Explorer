@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "OCIObjectStorageExplorer",
+    defaultLocalization: "pt-BR",
     platforms: [
         .macOS(.v13)
     ],
@@ -27,7 +28,10 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "OCIExplorerCore"
+            name: "OCIExplorerCore",
+            resources: [
+                .process("Resources")
+            ]
         ),
         .target(
             name: "OCIExplorerServices",
