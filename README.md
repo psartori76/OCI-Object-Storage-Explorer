@@ -15,6 +15,7 @@ This repository is useful if you are searching for:
 - Repository: [GitHub repository](https://github.com/psartori76/OCI-Object-Storage-Explorer)
 - Website: [Project website](https://psartori76.github.io/OCI-Object-Storage-Explorer/)
 - Latest release: [Download latest release](https://github.com/psartori76/OCI-Object-Storage-Explorer/releases/latest)
+- License: [PolyForm Noncommercial 1.0.0](LICENSE)
 
 ## Why This Project Exists
 
@@ -29,6 +30,7 @@ OCI Object Storage is powerful, but many workflows still happen in browser conso
 - Multilingual UI support with Portuguese (Brazil), English, and Spanish
 - Locale-aware formatting for dates, times, counts, and byte sizes
 - Release packaging into a macOS `.app` bundle
+- Source-available licensing for noncommercial use under PolyForm Noncommercial 1.0.0
 
 ## Features
 
@@ -73,6 +75,19 @@ OCI Object Storage is powerful, but many workflows still happen in browser conso
 - In-memory logging
 - Diagnostics screen with close action
 - Sensitive-data redaction in logs
+
+## License and Usage
+
+This repository is source-available under [PolyForm Noncommercial 1.0.0](LICENSE).
+
+- Noncommercial use is permitted under the license terms
+- Commercial use is not granted by this repository license
+- If you want to evaluate commercial use, redistribution in a commercial product, or another commercial arrangement, contact the author for separate permission
+
+Important positioning:
+
+- This project is source-available
+- It is not presented as OSI-approved open source
 
 ## Localization
 
