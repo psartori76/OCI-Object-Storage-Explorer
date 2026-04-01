@@ -206,32 +206,6 @@ xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer dire
 
 isso não é erro do projeto. Significa apenas que o macOS ainda está usando Command Line Tools em vez do `Xcode.app` como developer directory ativo.
 
-## Projeto iPhone no Xcode
-
-Também existe agora um projeto iOS separado em:
-
-```text
-Apps/OCIExploreriOS/OCIExploreriOS.xcodeproj
-```
-
-Para abrir direto no Xcode:
-
-```bash
-./scripts/open_ios_in_xcode.sh
-```
-
-Fluxo recomendado no Xcode:
-
-1. abrir `OCIExploreriOS.xcodeproj`
-2. aguardar a resolução do package local
-3. selecionar o scheme `OCIExploreriOS`
-4. rodar em um simulator de iPhone
-
-Observação:
-
-- a app iPhone usa o package local deste repositório como dependência
-- a app macOS continua separada e não foi substituída por esse projeto iOS
-
 ## Como buildar
 
 ### Via Xcode

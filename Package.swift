@@ -5,8 +5,7 @@ import PackageDescription
 let package = Package(
     name: "OCIObjectStorageExplorer",
     platforms: [
-        .macOS(.v13),
-        .iOS(.v17)
+        .macOS(.v13)
     ],
     products: [
         .library(
@@ -20,10 +19,6 @@ let package = Package(
         .library(
             name: "OCIExplorerShared",
             targets: ["OCIExplorerShared"]
-        ),
-        .library(
-            name: "OCIExploreriOSUI",
-            targets: ["OCIExploreriOSUI"]
         ),
         .executable(
             name: "OCIObjectStorageExplorer",
@@ -41,11 +36,6 @@ let package = Package(
         .target(
             name: "OCIExplorerShared",
             dependencies: ["OCIExplorerCore", "OCIExplorerServices"]
-        ),
-        .target(
-            name: "OCIExploreriOSUI",
-            dependencies: ["OCIExplorerCore", "OCIExplorerServices", "OCIExplorerShared"],
-            path: "Sources/OCIExploreriOSUI"
         ),
         .executableTarget(
             name: "OCIExplorerApp",
