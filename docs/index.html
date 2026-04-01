@@ -133,6 +133,30 @@
       grid-column: span 12;
     }
 
+    .detail-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .detail-list li {
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text);
+    }
+
+    .detail-list strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: 15px;
+    }
+
     h2 {
       margin: 0 0 14px;
       font-size: 24px;
@@ -154,24 +178,6 @@
       padding-left: 18px;
     }
 
-    .keyword-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 0;
-      list-style: none;
-    }
-
-    .keyword-list li {
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.75);
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 600;
-    }
-
     footer {
       padding: 0 0 56px;
       color: var(--muted);
@@ -182,6 +188,10 @@
       .card,
       .card.wide {
         grid-column: span 12;
+      }
+
+      .detail-list {
+        grid-template-columns: 1fr;
       }
 
       .hero {
@@ -222,11 +232,13 @@
       </article>
 
       <article class="card wide">
-        <h2>Why it is discoverable</h2>
-        <p>
-          This project is intentionally described using the terms developers actually search for: OCI Object Storage,
-          Oracle Cloud, macOS app, SwiftUI desktop client, bucket explorer, object browser, and native file transfer tool.
-        </p>
+        <h2>Core workflows</h2>
+        <ul>
+          <li>Create and manage saved OCI profiles with secure Keychain-backed secret storage</li>
+          <li>Navigate buckets and prefixes with breadcrumb navigation and inspector details</li>
+          <li>Upload and download files with a dedicated transfer queue, progress tracking, retry, and cancellation</li>
+          <li>Create and manage Pre-Authenticated Requests for bucket and object sharing</li>
+        </ul>
       </article>
 
       <article class="card">
@@ -240,20 +252,29 @@
       </article>
 
       <article class="card">
-        <h3>Languages</h3>
-        <p>Portuguese (Brazil), English, Spanish</p>
+        <h3>Architecture</h3>
+        <p>SwiftUI, MVVM, async/await, signed OCI REST integration</p>
       </article>
 
       <article class="card full">
-        <h2>Search-friendly keywords</h2>
-        <ul class="keyword-list">
-          <li>OCI Object Storage macOS app</li>
-          <li>Oracle Cloud Object Storage browser</li>
-          <li>SwiftUI OCI desktop client</li>
-          <li>macOS bucket explorer</li>
-          <li>OCI file transfer app</li>
-          <li>Oracle Cloud macOS desktop tool</li>
-          <li>Swift Object Storage browser</li>
+        <h2>Project snapshot</h2>
+        <ul class="detail-list">
+          <li>
+            <strong>Authentication</strong>
+            API Key-based OCI access with saved profiles, connection testing, namespace auto-detection, and region loading.
+          </li>
+          <li>
+            <strong>Object exploration</strong>
+            Bucket browsing, object metadata inspection, virtual folder navigation, search, and version history support.
+          </li>
+          <li>
+            <strong>Transfers and sharing</strong>
+            Native upload and download flows, conflict handling, transfer queue management, and PAR creation.
+          </li>
+          <li>
+            <strong>Localization</strong>
+            Multilingual interface with Portuguese (Brazil), English, and Spanish using Apple-native localization resources.
+          </li>
         </ul>
       </article>
     </section>
